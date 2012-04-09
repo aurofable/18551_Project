@@ -5,6 +5,8 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
@@ -33,7 +35,7 @@ public class Processing {
 	private long 		timeTaken;
 	private String 		imageName;
 	private boolean 	viewBinaryImage;
-	private String 		text, eigenText, dataText;
+	private String 		text, eigenText, dataText, meanText;
 	
 	public Processing(boolean viewBinImage, int width, int height, byte[] data){
 		viewBinaryImage = viewBinImage;
@@ -53,6 +55,7 @@ public class Processing {
 	}
 	
 	public Bitmap process() {
+		Mat rot = new Mat();
 		Mat res = new Mat();
 		Log.i(TAG, "Started Processing...");
 		long start = System.currentTimeMillis();
@@ -60,17 +63,20 @@ public class Processing {
 		storeImg();
 		Bitmap bitmap = getImgBitmap();
 		rgba = Utils.bitmapToMat(bitmap);
+		System.out.println("RGBA Size: w" + rgba.width() + " h" + rgba.height());
 		if (viewBinaryImage) {
 			temp = getBinaryImage(rgba);
-			res = getRotatedImage(temp);
-			Imgproc.resize(res, res, new Size(rgba.width(), rgba.height()));
-			Imgproc.cvtColor(res, res, Imgproc.COLOR_GRAY2RGBA, 4);
-			Core.putText(res, text, new Point(20, 150), 3, 1, new Scalar(255, 0, 0, 255), 2);
-			Core.putText(res, eigenText, new Point(20, 200), 3, 1, new Scalar(255, 0, 0, 255), 2);
+			rot = getRotatedImage(temp);
+			Imgproc.resize(rot, rot, new Size(rgba.width(), rgba.height()));
+			Imgproc.cvtColor(rot, rot, Imgproc.COLOR_GRAY2RGBA, 4);
 		}
 		else {
-			res = getRotatedImage(rgba);
+			rot = getRotatedImage(rgba);
 		}
+		
+		res = getCC(rot);
+		postProcess(res);
+		
 		//writeData();
 
     	long end = System.currentTimeMillis();
@@ -84,7 +90,7 @@ public class Processing {
 		bitmap.recycle();
 		return null;
 	}
-	
+
 	/**
 	 * storeImg stores the image onto the sdcard.
 	 * Necessary as there seems to be no good way to read in the 
@@ -122,6 +128,7 @@ public class Processing {
 	/**
 	 * getbinaryImage takes in a Mat and returns
 	 * the binary image as a Mat (single channel)
+	 * Does not seem to work too well on words....need a finer kernel size
 	 * @return
 	 */
 	private Mat getBinaryImage(Mat m) {
@@ -137,8 +144,8 @@ public class Processing {
     	
     	// Blurring
     	// Getting the gaussian kernel and blurring it
-    	Size gKernelSize = new Size(15, 15);
-    	double sigma = 30;
+    	Size gKernelSize = new Size(17, 17);
+    	double sigma = 10;
     	Imgproc.GaussianBlur(temp, temp, gKernelSize, sigma);
     	
     	// Thresholding
@@ -162,6 +169,15 @@ public class Processing {
 			binaryImage = m;
 		}
 		else binaryImage = getBinaryImage(m);
+		
+		// Writing binaryImage to sdcard for debugging
+		Log.i(TAG, "Writing binaryImage");
+		Mat binOut = new Mat();
+		Imgproc.cvtColor(binaryImage, binOut, Imgproc.COLOR_GRAY2RGBA, 4);
+		Bitmap bmp = Bitmap.createBitmap(binOut.cols(), binOut.rows(), Bitmap.Config.ARGB_8888);
+		Utils.matToBitmap(binOut, bmp);
+		storeBinImage(bmp);
+		Log.i(TAG, "Writing binaryImage Done");
 
 		// Running PCA
     	Mat eigenVecs = new Mat();
@@ -188,22 +204,54 @@ public class Processing {
     	Core.PCACompute(data, mean, eigenVecs, maxComponents);
     	System.out.println("Data has " + rowCnt + " members");
     	
+    	// RECHECK TO MAKE SURE THE EIGENVECTORS ARE SCALED CORRECTLY
     	double[] div1 = eigenVecs.get(0, 0);
-    	double[] div2 = eigenVecs.get(0, 1);
-    	double angle = Math.atan2(div1[0], div2[0]);
+    	double[] div2 = eigenVecs.get(1, 0);
+    	double[] mean1 = mean.get(0, 0);
+    	double[] mean2 = mean.get(0, 1);
+    	double angle = Math.atan2((div1[0] + mean1[0])*1944, (div2[0] + mean2[0])*2592);
     	double angleDeg = Math.toDegrees(angle);
     	text = "Angle is: " + angleDeg + " in degrees and " + angle + " in rad";
     	eigenText = "EigenVec: " + printMat(eigenVecs);
+    	meanText = "MeanVec: " + printMat(mean);
     	//dataText = printData(data);
-    	//Point center = new Point(m.width()/2, m.height()/2);
-    	Point center = new Point(0, 0);
+    	Point center = new Point(m.width()/2, m.height()/2);
+    	//Point center = new Point(0, 0);
     	Mat rot = Imgproc.getRotationMatrix2D(center, angleDeg, 1);
     	Imgproc.warpAffine(m, res, rot, res.size());
-    	if (!viewBinaryImage) {
-    		Core.putText(res, text, new Point(20, 150), 3, 1, new Scalar(255, 0, 0, 255), 2);
-    		Core.putText(res, eigenText, new Point(20, 200), 3, 1, new Scalar(255, 0, 0, 255), 2);
-    	}
     	return res;
+	}
+	
+	private Mat getCC(Mat m) {
+		// Assuming that rot mat is not grayscale
+		Log.i(TAG, "Finding CCs...");
+		Mat temp = new Mat();
+		Mat hierarchy = new Mat();
+		List<Mat> contoursAll = new LinkedList<Mat>();
+		List<Mat> contours = new LinkedList<Mat>();
+		
+		// Converting to single channel grayscale
+		Imgproc.cvtColor(m, temp, Imgproc.COLOR_BGR2GRAY, 1); // Grayscale to single channel
+		
+		// Downsampling
+		//Size downSize = new Size(m.width()/4, m.height()/4);
+    	//Imgproc.resize(temp, temp, downSize);
+    	//Imgproc.equalizeHist(temp, temp);
+		
+		Imgproc.findContours(temp, contoursAll, hierarchy, 1, 2);
+		
+		// Removing insignificant contours
+		for (Mat contour : contoursAll) {
+			double thresholdArea = 75*75;
+			if (Imgproc.contourArea(contour) > thresholdArea) {
+				contours.add(contour);
+			}
+		}
+		
+		Imgproc.drawContours(m, contours, -1, new Scalar(0, 255, 0, 255), 5);
+		//Imgproc.cvtColor(temp, temp, Imgproc.COLOR_GRAY2RGBA, 4);
+		Log.i(TAG, "Found CCs...");
+		return m;
 	}
 	
 	private String printMat(Mat m) {
@@ -264,5 +312,11 @@ public class Processing {
 		catch (IOException e) {
 			Log.e(TAG, "Exception writing to sdcard");
 		}
+	}
+	
+	private void postProcess(Mat m) {
+		Core.putText(m, text, new Point(20, 150), 3, 1, new Scalar(255, 0, 0, 255), 2);
+		Core.putText(m, eigenText, new Point(20, 200), 3, 1, new Scalar(255, 0, 0, 255), 2);
+		Core.putText(m, meanText, new Point(20, 250), 3, 1, new Scalar(255, 0, 0, 255), 2);
 	}
 }

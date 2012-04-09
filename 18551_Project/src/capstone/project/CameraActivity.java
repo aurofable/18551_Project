@@ -96,19 +96,11 @@ public class CameraActivity extends Activity {
 			@Override
 			public void onPictureTaken(byte[] data, Camera c) {
 				if (data == null) return;
-				
-				System.out.println("PREVIEW WIDTH: " + mPreview.getWidth() + " HEIGHT: " + mPreview.getHeight());
-				System.out.println("Data length: " + data.length);
-				System.out.println("Preview Format: " + mCamera.getParameters().getPreviewFormat());
-				System.out.println("Preview Size: " + "w" + mCamera.getParameters().getPreviewSize().width + " h" + mCamera.getParameters().getPreviewSize().height);
-				System.out.println("Camera Format: " + mCamera.getParameters().getPictureFormat());
-				System.out.println("Camera Size: " + "w" + mCamera.getParameters().getPictureSize().width + " h" + mCamera.getParameters().getPictureSize().height);
 				Processing p = new Processing(binaryImage, mPreview.getWidth(), mPreview.getHeight(), data);
 				Bitmap temp = p.process();
-				System.out.println("Finished Processing, received bitmap");
 				mOverlay.setBitmap(temp);
 				mOverlay.invalidate();
-				Toast.makeText(CameraActivity.this, "Done...Took " + p.getProcTime()/1000 + "s !", Toast.LENGTH_SHORT).show();
+				Toast.makeText(CameraActivity.this, "Done...Took " + p.getProcTime()/1000 + "s !", Toast.LENGTH_LONG).show();
 			}
     	};
     }
