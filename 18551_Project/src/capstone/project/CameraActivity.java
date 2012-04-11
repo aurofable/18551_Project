@@ -12,6 +12,8 @@ import android.hardware.Camera.AutoFocusCallback;
 import android.hardware.Camera.PictureCallback;
 import android.hardware.Camera.ShutterCallback;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -79,6 +81,11 @@ public class CameraActivity extends Activity {
     	return c;
     }
     
+    public void showBitmap(Bitmap b) {
+    	mOverlay.setBitmap(b);
+    	mOverlay.invalidate();
+    }
+    
     /*
      * Call-backs as necessary
      */
@@ -96,11 +103,8 @@ public class CameraActivity extends Activity {
 			@Override
 			public void onPictureTaken(byte[] data, Camera c) {
 				if (data == null) return;
-				Processing p = new Processing(binaryImage, mPreview.getWidth(), mPreview.getHeight(), data);
-				Bitmap temp = p.process();
-				mOverlay.setBitmap(temp);
-				mOverlay.invalidate();
-				Toast.makeText(CameraActivity.this, "Done...Took " + p.getProcTime()/1000 + "s !", Toast.LENGTH_LONG).show();
+				Processing p = new Processing(mHandler, binaryImage, mPreview.getWidth(), mPreview.getHeight(), data);
+				new Thread(p).start();
 			}
     	};
     }
@@ -160,8 +164,7 @@ public class CameraActivity extends Activity {
 		return new Button.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				mOverlay.setBitmap(null);
-				mOverlay.invalidate();
+				showBitmap(null);
 				Toast.makeText(CameraActivity.this, "RESET!", Toast.LENGTH_SHORT).show();
 			}
 		};
@@ -170,4 +173,11 @@ public class CameraActivity extends Activity {
 	public void toasts(int data) {
 		Toast.makeText(this, "Native code returned: " + data, Toast.LENGTH_LONG).show();
 	}
+	
+	Handler mHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			Bitmap b = (Bitmap) msg.obj;
+			showBitmap(b);
+		}
+	};
 }
