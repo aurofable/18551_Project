@@ -51,7 +51,7 @@ public class ClientActivity extends Activity {
 			DataInputStream dataInputStream = null;
 
 			try {
-				socket = new Socket("10.0.2.15", 8888);
+				socket = new Socket("128.237.120.224", 8888);
 				dataOutputStream = new DataOutputStream(socket
 						.getOutputStream());
 				dataInputStream = new DataInputStream(socket.getInputStream());
