@@ -1,6 +1,10 @@
 package capstone.project.client;
 
+import java.io.ByteArrayOutputStream;
+
 import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -13,6 +17,7 @@ public class ClientActivity extends Activity {
 
 	EditText textOut;
 	TextView textIn;
+	int CAMERA_PIC_REQUEST = 1234;
 	
 	
 	Handler mHandler = new Handler() {
@@ -38,8 +43,22 @@ public class ClientActivity extends Activity {
 
 		@Override
 		public void onClick(View arg0) {
-			TCPThread t = new TCPThread(mHandler, textOut.getText().toString());
-			new Thread(t).start();
+			Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+			startActivityForResult(cameraIntent, CAMERA_PIC_REQUEST);  
 		}
 	};
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+	    if (requestCode == CAMERA_PIC_REQUEST) {
+	    	Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
+	    	
+	    	ByteArrayOutputStream baos = new ByteArrayOutputStream();  
+	    	thumbnail.compress(Bitmap.CompressFormat.PNG, 100, baos); //bm is the bitmap object
+	    	byte[] b = baos.toByteArray();  
+	    	
+			TCPThread t = new TCPThread(mHandler, b);
+			new Thread(t).start();
+	    }
+	} 
 }

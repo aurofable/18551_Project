@@ -12,15 +12,15 @@ import android.os.Message;
 public class TCPThread implements Runnable {
 
 	private Handler		handler;
-	private String		data;
+	private byte[]		data;
 	
 	Socket socket = null;
 	DataOutputStream dataOutputStream = null;
 	DataInputStream dataInputStream = null;
 	
-	public TCPThread(Handler handler, String send) {
+	public TCPThread(Handler handler, byte[] data) {
 		this.handler = handler;
-		this.data = send;
+		this.data = data;
 	}
 	
 	private void updateDisplay(CharSequence c) {
@@ -38,7 +38,7 @@ public class TCPThread implements Runnable {
 			dataOutputStream = new DataOutputStream(socket
 					.getOutputStream());
 			dataInputStream = new DataInputStream(socket.getInputStream());
-			dataOutputStream.writeUTF(data);
+			dataOutputStream.write(data);
 			updateDisplay(dataInputStream.readUTF());
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block

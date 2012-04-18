@@ -6,9 +6,12 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class MyServer {
+public class Server {
+	
 
 	public static void main(String[] args) {
+		
+		int count = 0;
 		ServerSocket serverSocket = null;
 		Socket socket = null;
 		DataInputStream dataInputStream = null;
@@ -29,8 +32,9 @@ public class MyServer {
 				dataOutputStream = new DataOutputStream(socket
 						.getOutputStream());
 				System.out.println("ip: " + socket.getInetAddress());
-				System.out.println("message: " + dataInputStream.readUTF());
-				dataOutputStream.writeUTF("Hello!");
+				System.out.println("message: " + dataInputStream.readUTF() + count);
+				dataOutputStream.writeUTF("Hello! " + count);
+				count++;
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
