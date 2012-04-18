@@ -41,6 +41,7 @@ public class Processing implements Runnable{
 	private boolean 	viewBinaryImage;
 	private String 		text, eigenText, dataText, meanText;
 	private Handler		handler;
+	private List<Mat> 	charMatList;
 	
 	public Processing(Handler handler, boolean viewBinImage, int width, int height, byte[] data){
 		viewBinaryImage = viewBinImage;
@@ -54,6 +55,7 @@ public class Processing implements Runnable{
 		Log.i(TAG, "Instantiated new " + this.getClass());
 		this.imageName = "temp.jpg";
 		this.handler = handler;
+		this.charMatList = new LinkedList<Mat>();
 	}
 	
 	public long getProcTime() {
@@ -80,6 +82,7 @@ public class Processing implements Runnable{
 		
 		res = getCC(rot);
 		postProcess(res);
+		writeSegmentedImages();
 		
 		//writeData();
 
@@ -264,9 +267,12 @@ public class Processing implements Runnable{
 		
 		// Removing insignificant contours
 		int numContours = 0;
+		double thresholdArea = 75*75;
+		double totalArea = rgba.width()*rgba.height();
+		System.out.println("Total Area is " + totalArea);
 		for (Mat contour : contoursAll) {
-			double thresholdArea = 75*75;
-			if (Imgproc.contourArea(contour) > thresholdArea) {
+			double area = Imgproc.contourArea(contour);
+			if (thresholdArea < area && area < totalArea) {
 				System.out.println("Size of Contours: " + contour.size());
 				contours.add(contour);
 				numContours++;
@@ -301,11 +307,13 @@ public class Processing implements Runnable{
 			Mat rectPoints = getAllPointsRect(rect);
 			rects.add(rectPoints);
 			System.out.println("Size of res Mat: " + rectPoints.size());
+			
+			// Extracting the rect
+			Mat roi = m.submat(rect);
+			charMatList.add(roi);
 		}
 		
-		Imgproc.drawContours(m, rects, -1, new Scalar(255, 0, 0), 5);
-		
-		
+		Imgproc.drawContours(m, rects, -1, new Scalar(255, 0, 0), 5);		
 		
 		//Imgproc.cvtColor(temp, temp, Imgproc.COLOR_GRAY2RGBA, 4);
 		Log.i(TAG, "Found CCs...");
@@ -358,16 +366,9 @@ public class Processing implements Runnable{
 			res.put(rowCnt, 0, coord);
 			rowCnt++;
 		}
-		
-		System.out.println("NumPoints and rowCnt match: " + (rowCnt == numPoints));
-		if (rowCnt != numPoints) System.out.println("NumPoints: " + numPoints + "rowCnt: " + rowCnt);
 		return res;
 	}
 	
-	private Mat getBoxes(Mat m) {
-		
-		return null;
-	}
 	
 	private String printMat(Mat m) {
 		String res = "";
@@ -440,6 +441,34 @@ public class Processing implements Runnable{
 		msg.obj = bitmap;
 		msg.arg1 = 1;
 		handler.sendMessage(msg);
+	}
+	
+	private void writeSegmentedImages() {
+		if (charMatList.size() == 0) return;
+		File sdcard = Environment.getExternalStorageDirectory();
+		File dir = new File(sdcard.getAbsolutePath() + "/transOptic/segImgs");
+		if (!dir.exists()) dir.mkdirs();	
+			
+		int imageCnt = 1;
+		for (Mat roi : charMatList) {
+			if (imageCnt == 4) break;
+			File file = new File(dir, "char" + imageCnt + ".jpg");
+			if (file.exists()) file.delete();
+			Bitmap bitmap = Bitmap.createBitmap(roi.cols(), roi.rows(), Bitmap.Config.ARGB_8888);
+			Utils.matToBitmap(roi, bitmap);
+			try {
+				FileOutputStream fos = new FileOutputStream(file.getPath());
+				bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+				fos.flush();
+				fos.close();
+			}
+			catch (IOException e) {
+				Log.e(TAG, "Exception writing segmented images");
+			}
+			imageCnt++;
+			bitmap.recycle();
+			System.gc();
+		}
 	}
 
 	@Override
