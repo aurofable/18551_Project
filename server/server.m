@@ -7,18 +7,28 @@
 % computation on it and transmits it back to the client
 
 clear all;
-running = 1;
-fileStats = dir;
-touchtime = fileStats(4).datenum;
+load svmTrain.mat
 
 receivedFileName = 'received.jpg';
 sentFileName = 'sent.jpg';
 ansFileName = 'ans.txt';
 fclose('all');
 
+running = 1;
+fileStats = dir;
+fileIndex = 1;
+for i = 1:length(fileStats)
+    findFile = fileStats(i).name;
+    if (strcmp(findFile,receivedFileName) == 1)
+        break
+    end
+    fileIndex = fileIndex + 1;
+end
+touchtime = fileStats(fileIndex).datenum;
+
 while (running == 1)
     fileStats = dir;
-    currTouchTime = fileStats(4).datenum; %receivedFileName
+    currTouchTime = fileStats(fileIndex).datenum;
     if (currTouchTime > touchtime)
         % File updated...get to work
         disp('File Received!');
@@ -30,13 +40,19 @@ while (running == 1)
         img = imread(receivedFileName);
         
         % Processing...
-        img = im2bw(img);
-        
+        chars = segment(img);
+        ansString = zeros(length(chars), 1);
+        for i = 1:length(chars)
+            answer = capstoneClassify(chars{i}, svmMatrix, labels);
+            ansString(i) = answer
+        end
         
         % Post-Processing
+        img = im2bw(img); % just for effect
         imwrite(img, sentFileName);
-        fprintf(ansFile, 'asd==%6.3f', touchtime);
+        fprintf(ansFile, '%s', mat2str(ansString));
         fclose(ansFile);
+        disp(['Answer:' mat2str(ansString)]);
         disp('Done!');
         disp('');
     end

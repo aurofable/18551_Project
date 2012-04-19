@@ -1,0 +1,23 @@
+% Spring 2012, 18-551 Project
+% James Chun, jtchun@andrew.cmu.edu
+% getHistTextureFeature
+
+img = imread('received.jpg');
+chars = segment(img);
+img = chars{2};
+[dimY dimX] = size(img);
+
+rowDiv = 4;
+colDiv = 4;
+
+vec = zeros(rowDiv * colDiv, 1);
+index = 1;
+for i = 1:dimY/rowDiv:dimY
+    for j = 1:dimX/colDiv:dimX
+        yStart = ((i-1)*dimY/rowDiv)+1;
+        xStart = ((j-1)*dimX/colDiv)+1;
+        sector = imcrop(img, [xStart yStart dimX/colDiv dimY/rowDiv]);
+        sector = histeq(sector);
+    end 
+end
+
