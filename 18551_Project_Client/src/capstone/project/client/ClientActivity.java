@@ -1,62 +1,91 @@
 package capstone.project.client;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.FrameLayout;
 
 public class ClientActivity extends Activity {
 
-	EditText textOut;
-	TextView textIn;
+	/* CameraActivity Variables */
+	private Overlay 		overlay;
+	private Button 			buttonStart, buttonReset;
+	
 	int CAMERA_PIC_REQUEST = 1234;
+	String path = Environment.getExternalStorageDirectory() + "/send.jpg";
 	
 	
 	Handler mHandler = new Handler() {
 		public void handleMessage(Message msg) {
-			CharSequence c = (CharSequence) msg.obj;
-			textIn.setText(c);
+			Bitmap b = (Bitmap) msg.obj;
+			showBitmap(b);
 		}
 	};
+	
+	public void showBitmap(Bitmap b) {
+    	overlay.setBitmap(b);
+    	overlay.invalidate();
+    }
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+		
+		// Create our Overlay
+        overlay = new Overlay(this);
+        FrameLayout overlayView = (FrameLayout) findViewById(R.id.overlay);
+        overlayView.addView(overlay);
 
-		textOut = (EditText) findViewById(R.id.textout);
-		Button buttonSend = (Button) findViewById(R.id.send);
-		textIn = (TextView) findViewById(R.id.textin);
-		buttonSend.setOnClickListener(buttonSendOnClickListener);
+		buttonStart = (Button) findViewById(R.id.takePicture);
+		buttonStart.setOnClickListener(buttonSendOnClickListener);
+		buttonReset = (Button) findViewById(R.id.reset);
+		buttonReset.setOnClickListener(buttonResetOnClickListener);
 	}
 
 	Button.OnClickListener buttonSendOnClickListener = new Button.OnClickListener() {
-
 		@Override
 		public void onClick(View arg0) {
+			File file = new File(path);
+			Uri outputFileUri = Uri.fromFile(file);
 			Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-			startActivityForResult(cameraIntent, CAMERA_PIC_REQUEST);  
+			cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
+			startActivityForResult(cameraIntent, CAMERA_PIC_REQUEST);
+		}
+	};
+	
+	Button.OnClickListener buttonResetOnClickListener = new Button.OnClickListener() {
+		@Override
+		public void onClick(View arg0) {
+			showBitmap(null);
 		}
 	};
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 	    if (requestCode == CAMERA_PIC_REQUEST) {
-	    	Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
+	    	
+	    	BitmapFactory.Options opt = new BitmapFactory.Options();
+	    	opt.inSampleSize = 1; // reduce size?
+	    	Bitmap bitmap = BitmapFactory.decodeFile(path, opt);
+	    	showBitmap(bitmap);
 	    	
 	    	ByteArrayOutputStream baos = new ByteArrayOutputStream();  
-	    	thumbnail.compress(Bitmap.CompressFormat.PNG, 100, baos); //bm is the bitmap object
+	    	bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos); //bm is the bitmap object
 	    	byte[] b = baos.toByteArray();  
-	    	
 			TCPThread t = new TCPThread(mHandler, b);
 			new Thread(t).start();
 	    }

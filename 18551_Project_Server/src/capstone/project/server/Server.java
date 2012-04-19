@@ -2,6 +2,7 @@ package capstone.project.server;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -16,61 +17,85 @@ public class Server {
 
 	public static void main(String[] args) {
 
-		int count = 0;
+		final int port = 8888;
+		final String received = "C:/Users/James/Desktop/server/received.jpg";
+		final String sent = "C:/Users/James/Desktop/server/sent.jpg";
+		
+		File receivedFile = new File(received);
+		File sentFile = new File(sent);
+
+		byte[] inData;
+		byte[] outData;
 		ServerSocket serverSocket = null;
 		Socket socket = null;
 		DataInputStream dataInputStream = null;
 		DataOutputStream dataOutputStream = null;
 
 		try {
-			serverSocket = new ServerSocket(8888);
-			System.out.println("Listening :8888");
+			serverSocket = new ServerSocket(port);
+			System.out.println("Listening On:" + port);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 		while (true) {
 			try {
-				int done = 1234;
-				byte[] data;
+
 				socket = serverSocket.accept();
 				dataInputStream = new DataInputStream(socket.getInputStream());
 				dataOutputStream = new DataOutputStream(socket
 						.getOutputStream());
-				System.out.println("ip: " + socket.getInetAddress());
-				System.out.println("message: " + count);
+				System.out.println("Received connection IP: "
+						+ socket.getInetAddress());
 
 				// Receive the length for allocation
 				int length = dataInputStream.readInt();
-				System.out.println("Received allocation size: " + length);
-				data = new byte[length];
-
-				// Tell them to send it over
-				System.out.println("Requesting data... ");
-				dataOutputStream.writeInt(done);
+				System.out.println("\tReceived allocation size: " + length);
+				inData = new byte[length];
 
 				// Receive data
-				System.out.println("Reeading Data... ");
-				dataInputStream.readFully(data);
-				System.out.println("Received Data... ");
+				System.out.println("\tReading Data... ");
+				dataInputStream.readFully(inData);
+				System.out.println("\tReceived Data...Writing... ");
+				
+				// Get current sent state
+				long currSentTime = sentFile.lastModified();
 
 				// Save it
-				InputStream in = new ByteArrayInputStream(data);
+				InputStream in = new ByteArrayInputStream(inData);
 				BufferedImage image = ImageIO.read(in);
-				ImageIO.write(image, "jpg", new File("C:/Users/James/Desktop/server/received.jpg"));
-
-				dataOutputStream.writeUTF("Hello! " + count);
-				count++;
+				ImageIO.write(image, "jpg", receivedFile);
+				System.out.println("\tSaved File ");
+				
+				// Wait for it to be processed
+				while (currSentTime <= sentFile.lastModified()) {
+					Thread.sleep( (long) 0.001 );
+				}
+				
+				// Processed, send the processed file
+				System.out.println("\tFile Processed");
+				image = ImageIO.read(sentFile);
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				ImageIO.write( image, "jpg", baos );
+				baos.flush();
+				outData = baos.toByteArray();
+				baos.close();
+				
+				dataOutputStream.flush();
+				System.out.println("\tSending allocation size: " + outData.length);
+				dataOutputStream.writeInt(outData.length);
+				dataOutputStream.write(outData);
+				System.out.println("\tSent!");
+				
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InterruptedException e) {
 				e.printStackTrace();
 			} finally {
 				if (socket != null) {
 					try {
 						socket.close();
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
@@ -79,7 +104,6 @@ public class Server {
 					try {
 						dataInputStream.close();
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
@@ -88,7 +112,6 @@ public class Server {
 					try {
 						dataOutputStream.close();
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
