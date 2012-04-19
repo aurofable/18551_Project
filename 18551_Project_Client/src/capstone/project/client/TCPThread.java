@@ -34,12 +34,33 @@ public class TCPThread implements Runnable {
 	@Override
 	public void run() {
 		try {
+			int done = 1234;
+			long sleeptime = (long) 0.0001;
 			socket = new Socket("128.237.120.224", 8888); // need to run ipconfig/ifconfig to get the ip here 
 			dataOutputStream = new DataOutputStream(socket
 					.getOutputStream());
 			dataInputStream = new DataInputStream(socket.getInputStream());
+			
+			// Send over the size of the file first, for allocation
+			dataOutputStream.writeByte(data.length);
+			
+			// Wait for response
+			while (dataInputStream.read() != done) {
+				try {
+					Thread.sleep(sleeptime);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			
+			// Send picture over
+			dataOutputStream.flush(); // ensure channel is clear
 			dataOutputStream.write(data);
+			
+			// Update display with output from server
 			updateDisplay(dataInputStream.readUTF());
+			
+			
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

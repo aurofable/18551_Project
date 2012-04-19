@@ -1,16 +1,21 @@
 package capstone.project.server;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import javax.imageio.ImageIO;
+
 public class Server {
-	
 
 	public static void main(String[] args) {
-		
+
 		int count = 0;
 		ServerSocket serverSocket = null;
 		Socket socket = null;
@@ -27,12 +32,30 @@ public class Server {
 
 		while (true) {
 			try {
+				int done = 1234;
+				byte[] data;
 				socket = serverSocket.accept();
 				dataInputStream = new DataInputStream(socket.getInputStream());
 				dataOutputStream = new DataOutputStream(socket
 						.getOutputStream());
 				System.out.println("ip: " + socket.getInetAddress());
-				System.out.println("message: " + dataInputStream.readUTF() + count);
+				System.out.println("message: " + count);
+
+				// Receive the length for allocation
+				int length = dataInputStream.readInt();
+				data = new byte[length];
+
+				// Tell them to send it over
+				dataOutputStream.writeInt(done);
+
+				// Receive data
+				dataInputStream.readFully(data);
+
+				// Save it
+				InputStream in = new ByteArrayInputStream(data);
+				BufferedImage image = ImageIO.read(in);
+				ImageIO.write(image, "jpg", new File("C:/Users/James/Desktop/server/received.jpg"));
+
 				dataOutputStream.writeUTF("Hello! " + count);
 				count++;
 			} catch (IOException e) {
