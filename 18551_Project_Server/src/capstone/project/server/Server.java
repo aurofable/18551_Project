@@ -103,8 +103,8 @@ public class Server {
 	                        .append(System.getProperty(
 	                                "line.separator"));
 	            }
-		        System.out.println("\tAnswer: " + text);
-		        dataOutputStream.writeChars(text);
+		        System.out.println("\tAnswer: " + contents.toString());
+		        dataOutputStream.writeChars(contents.toString());
 				
 			} catch (IOException e) {
 				e.printStackTrace();
