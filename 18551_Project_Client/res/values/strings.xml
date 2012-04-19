@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">18551_Project_Client</string>
-	<string name="send">Send</string>
-	<string name="hello">Hello</string>
 </resources>

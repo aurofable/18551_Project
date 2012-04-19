@@ -1,11 +1,13 @@
 package capstone.project.server;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.ServerSocket;
@@ -20,6 +22,7 @@ public class Server {
 		final int port = 8888;
 		final String received = "C:/Users/James/Desktop/server/received.jpg";
 		final String sent = "C:/Users/James/Desktop/server/sent.jpg";
+		final String ans = "C:/Users/James/Desktop/server/ans.txt";
 		
 		File receivedFile = new File(received);
 		File sentFile = new File(sent);
@@ -30,6 +33,7 @@ public class Server {
 		Socket socket = null;
 		DataInputStream dataInputStream = null;
 		DataOutputStream dataOutputStream = null;
+        BufferedReader reader = null;
 
 		try {
 			serverSocket = new ServerSocket(port);
@@ -59,7 +63,7 @@ public class Server {
 				System.out.println("\tReceived Data...Writing... ");
 				
 				// Get current sent state
-				long currSentTime = sentFile.lastModified();
+				long initSentTime = sentFile.lastModified();
 
 				// Save it
 				InputStream in = new ByteArrayInputStream(inData);
@@ -68,8 +72,9 @@ public class Server {
 				System.out.println("\tSaved File ");
 				
 				// Wait for it to be processed
-				while (currSentTime <= sentFile.lastModified()) {
-					Thread.sleep( (long) 0.001 );
+				while (initSentTime >= sentFile.lastModified()) {
+					sentFile = new File(sent);
+					Thread.sleep( (long) 100 );
 				}
 				
 				// Processed, send the processed file
@@ -85,7 +90,21 @@ public class Server {
 				System.out.println("\tSending allocation size: " + outData.length);
 				dataOutputStream.writeInt(outData.length);
 				dataOutputStream.write(outData);
-				System.out.println("\tSent!");
+				System.out.println("\tSent File!");
+				
+				// Sending the string output
+				dataOutputStream.flush();
+				File file = new File(ans);
+		        StringBuffer contents = new StringBuffer();
+	            reader = new BufferedReader(new FileReader(file));
+	            String text = null;
+	            while ((text = reader.readLine()) != null) {
+	                contents.append(text)
+	                        .append(System.getProperty(
+	                                "line.separator"));
+	            }
+		        System.out.println("\tAnswer: " + text);
+		        dataOutputStream.writeChars(text);
 				
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -115,6 +134,13 @@ public class Server {
 						e.printStackTrace();
 					}
 				}
+				if (reader != null) {
+                    try {
+						reader.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+                }
 			}
 		}
 	}

@@ -16,12 +16,14 @@ import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 public class ClientActivity extends Activity {
 
 	/* CameraActivity Variables */
 	private Overlay 		overlay;
 	private Button 			buttonStart, buttonReset;
+	private TextView		ansView;
 	
 	int CAMERA_PIC_REQUEST = 1234;
 	String path = Environment.getExternalStorageDirectory() + "/send.jpg";
@@ -29,8 +31,18 @@ public class ClientActivity extends Activity {
 	
 	Handler mHandler = new Handler() {
 		public void handleMessage(Message msg) {
-			Bitmap b = (Bitmap) msg.obj;
-			showBitmap(b);
+			
+			switch (msg.arg1) {
+			case 0:
+				String s = (String) msg.obj;
+				ansView.setText(s);
+				break;
+			case 1:
+				Bitmap b = (Bitmap) msg.obj;
+				showBitmap(b);
+				break;
+				
+			}
 		}
 	};
 	
@@ -49,6 +61,9 @@ public class ClientActivity extends Activity {
         overlay = new Overlay(this);
         FrameLayout overlayView = (FrameLayout) findViewById(R.id.overlay);
         overlayView.addView(overlay);
+        
+        // Creating our answer view
+        ansView = (TextView) findViewById(R.id.answer);
 
 		buttonStart = (Button) findViewById(R.id.takePicture);
 		buttonStart.setOnClickListener(buttonSendOnClickListener);
@@ -71,6 +86,7 @@ public class ClientActivity extends Activity {
 		@Override
 		public void onClick(View arg0) {
 			showBitmap(null);
+			ansView.setText("");
 		}
 	};
 	

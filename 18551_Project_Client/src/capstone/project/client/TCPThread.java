@@ -51,7 +51,14 @@ public class TCPThread implements Runnable {
 	private void updateDisplay(Bitmap b) {
 		Message msg = new Message();
 		msg.obj = b;
-		// msg.arg1 = 1;
+		msg.arg1 = 1;
+		handler.sendMessage(msg);
+	}
+	
+	private void updateAns(String s) {
+		Message msg = new Message();
+		msg.obj = s;
+		msg.arg1 = 0;
 		handler.sendMessage(msg);
 	}
 
@@ -89,7 +96,11 @@ public class TCPThread implements Runnable {
 			// Converting and displaying bitmap
 			Bitmap bitmap =  BitmapFactory.decodeByteArray(inData, 0, length);
 			updateDisplay(bitmap);
-
+			
+			// Receiving Answer
+			String ans = dataInputStream.readLine();
+			updateAns(ans);
+			
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
