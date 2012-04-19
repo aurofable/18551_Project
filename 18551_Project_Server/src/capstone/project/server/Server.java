@@ -43,13 +43,17 @@ public class Server {
 
 				// Receive the length for allocation
 				int length = dataInputStream.readInt();
+				System.out.println("Received allocation size: " + length);
 				data = new byte[length];
 
 				// Tell them to send it over
+				System.out.println("Requesting data... ");
 				dataOutputStream.writeInt(done);
 
 				// Receive data
+				System.out.println("Reeading Data... ");
 				dataInputStream.readFully(data);
+				System.out.println("Received Data... ");
 
 				// Save it
 				InputStream in = new ByteArrayInputStream(data);

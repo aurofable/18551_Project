@@ -42,6 +42,7 @@ public class TCPThread implements Runnable {
 			dataInputStream = new DataInputStream(socket.getInputStream());
 			
 			// Send over the size of the file first, for allocation
+			System.out.println("Sending over data size: " + data.length);
 			dataOutputStream.writeByte(data.length);
 			
 			// Wait for response
@@ -53,10 +54,12 @@ public class TCPThread implements Runnable {
 				}
 			}
 			
+			System.out.println("Response OK! Sending over picture");
 			// Send picture over
 			dataOutputStream.flush(); // ensure channel is clear
 			dataOutputStream.write(data);
 			
+			System.out.println("Picture sent!");
 			// Update display with output from server
 			updateDisplay(dataInputStream.readUTF());
 			
