@@ -35,7 +35,7 @@ public class ClientActivity extends Activity {
 			switch (msg.arg1) {
 			case 0:
 				String s = (String) msg.obj;
-				ansView.setText(s);
+				if (s != null) ansView.setText(s);
 				break;
 			case 1:
 				Bitmap b = (Bitmap) msg.obj;
@@ -74,6 +74,7 @@ public class ClientActivity extends Activity {
 	Button.OnClickListener buttonSendOnClickListener = new Button.OnClickListener() {
 		@Override
 		public void onClick(View arg0) {
+			overlay.cleanBitmap();
 			File file = new File(path);
 			Uri outputFileUri = Uri.fromFile(file);
 			Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
@@ -85,7 +86,7 @@ public class ClientActivity extends Activity {
 	Button.OnClickListener buttonResetOnClickListener = new Button.OnClickListener() {
 		@Override
 		public void onClick(View arg0) {
-			showBitmap(null);
+			overlay.cleanBitmap(); // not clearing bitmap?
 			ansView.setText("");
 		}
 	};
@@ -95,7 +96,7 @@ public class ClientActivity extends Activity {
 	    if (requestCode == CAMERA_PIC_REQUEST) {
 	    	
 	    	BitmapFactory.Options opt = new BitmapFactory.Options();
-	    	opt.inSampleSize = 1; // reduce size?
+	    	opt.inSampleSize = 2; // reduce size?
 	    	Bitmap bitmap = BitmapFactory.decodeFile(path, opt);
 	    	showBitmap(bitmap);
 	    	

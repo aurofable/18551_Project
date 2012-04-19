@@ -33,6 +33,11 @@ public class Overlay extends View {
     	this.image = image;
     }
     
+    public void cleanBitmap() {
+    	if (this.image != null) this.image.recycle();
+    	this.image = null;
+    }
+    
     public Bitmap getBitmap() {
     	return this.image;
     }

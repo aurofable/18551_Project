@@ -20,9 +20,9 @@ public class Server {
 	public static void main(String[] args) {
 
 		final int port = 8888;
-		final String received = "C:/Users/James/Desktop/server/received.jpg";
-		final String sent = "C:/Users/James/Desktop/server/sent.jpg";
-		final String ans = "C:/Users/James/Desktop/server/ans.txt";
+		final String received = "C:/Users/James/git/18551_Project/server/received.jpg";
+		final String sent = "C:/Users/James/git/18551_Project/server/sent.jpg";
+		final String ans = "C:/Users/James/git/18551_Project/server/ans.txt";
 		
 		File receivedFile = new File(received);
 		File sentFile = new File(sent);
@@ -103,8 +103,8 @@ public class Server {
 	                        .append(System.getProperty(
 	                                "line.separator"));
 	            }
-		        System.out.println("\tAnswer: " + text);
-		        dataOutputStream.writeChars(text);
+		        System.out.println("\tAnswer: " + contents.toString());
+		        dataOutputStream.writeChars(contents.toString());
 				
 			} catch (IOException e) {
 				e.printStackTrace();
