@@ -4,6 +4,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -15,6 +17,7 @@ import android.os.Message;
 import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -22,8 +25,11 @@ public class ClientActivity extends Activity {
 
 	/* CameraActivity Variables */
 	private Overlay 		overlay;
-	private Button 			buttonStart, buttonReset;
+	private Button 			buttonStart, buttonReset, buttonSetip;
 	private TextView		ansView;
+	
+	private int port = 8888;
+	private String ipAdd = "128.237.117.23";
 	
 	int CAMERA_PIC_REQUEST = 1234;
 	String path = Environment.getExternalStorageDirectory() + "/send.jpg";
@@ -69,6 +75,8 @@ public class ClientActivity extends Activity {
 		buttonStart.setOnClickListener(buttonSendOnClickListener);
 		buttonReset = (Button) findViewById(R.id.reset);
 		buttonReset.setOnClickListener(buttonResetOnClickListener);
+		buttonSetip = (Button) findViewById(R.id.setip);
+		buttonSetip.setOnClickListener(buttonSetOnClickListener);
 	}
 
 	Button.OnClickListener buttonSendOnClickListener = new Button.OnClickListener() {
@@ -91,6 +99,40 @@ public class ClientActivity extends Activity {
 		}
 	};
 	
+	private AlertDialog.Builder setIPDialog() {
+		AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+		alert.setTitle("Setup IP");
+		alert.setMessage("Enter the IP Address of the Computation Server");
+
+		// Set an EditText view to get user input 
+		final EditText input = new EditText(this);
+		alert.setView(input);
+
+		alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+		public void onClick(DialogInterface dialog, int whichButton) {
+		  String value = input.getText().toString();
+		  	ipAdd = value;
+		  }
+		});
+
+		alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+		  public void onClick(DialogInterface dialog, int whichButton) {
+		    // Canceled.
+		  }
+		});
+		return alert;
+	}
+	
+	
+	
+	Button.OnClickListener buttonSetOnClickListener = new Button.OnClickListener() {
+		@Override
+		public void onClick(View arg0) {
+			setIPDialog().show();
+		}
+	};
+	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 	    if (requestCode == CAMERA_PIC_REQUEST) {
@@ -103,7 +145,7 @@ public class ClientActivity extends Activity {
 	    	ByteArrayOutputStream baos = new ByteArrayOutputStream();  
 	    	bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos); //bm is the bitmap object
 	    	byte[] b = baos.toByteArray();  
-			TCPThread t = new TCPThread(mHandler, b);
+			TCPThread t = new TCPThread(ipAdd, port, mHandler, b);
 			new Thread(t).start();
 	    }
 	} 
