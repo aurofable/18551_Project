@@ -17,8 +17,8 @@ public class TCPThread implements Runnable {
 	private static final String TAG = "Capstone::TCPThread";
 
 	/* Variables */
-	private static final String ipAdd = "128.237.120.224";
-	private static final int port = 8888;
+	private String ipAdd = "128.237.117.23";
+	private int port = 8888;
 
 	/* Data and Processing */
 	private byte[] inData, outData;
@@ -37,6 +37,13 @@ public class TCPThread implements Runnable {
 	 * @param handler
 	 * @param data
 	 */
+	public TCPThread(String ipAdd, int port, Handler handler, byte[] data) {
+		this.handler = handler;
+		this.outData = data;
+		this.ipAdd = ipAdd;
+		this.port = 8888;
+	}
+	
 	public TCPThread(Handler handler, byte[] data) {
 		this.handler = handler;
 		this.outData = data;

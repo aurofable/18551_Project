@@ -31,6 +31,14 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.51"
             android:text="Reset" />
+        
+        <Button
+            android:id="@+id/setip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.51"
+            android:text="Set Server IP" />
+        
     </LinearLayout>
 
     <TextView
@@ -39,6 +47,6 @@
         android:layout_height="wrap_content"
         android:gravity="center_vertical|center_horizontal"
         android:textSize="32sp"
-        android:text="asd" />
+        android:text="" />
 
 </LinearLayout>
