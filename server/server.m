@@ -7,7 +7,8 @@
 % computation on it and transmits it back to the client
 
 clear all;
-load svmTrain.mat
+%load svmTrain.mat
+load svmTrainLibSVM.mat
 
 receivedFileName = 'received.jpg';
 sentFileName = 'sent.jpg';
@@ -16,13 +17,13 @@ fclose('all');
 
 running = 1;
 fileStats = dir;
-fileIndex = 1;
+fileIndex = 0;
 for i = 1:length(fileStats)
+    fileIndex = fileIndex + 1;
     findFile = fileStats(i).name;
     if (strcmp(findFile,receivedFileName) == 1)
         break
     end
-    fileIndex = fileIndex + 1;
 end
 touchtime = fileStats(fileIndex).datenum;
 
@@ -35,24 +36,20 @@ while (running == 1)
         disp('Processing...');
         touchtime = currTouchTime;
         ansFile = fopen(ansFileName, 'wt');
-        pause(0.1); % wait a bit just in case its sent slow
+        pause(0.5); % wait a bit just in case its sent slow
         
         img = imread(receivedFileName);
         
         % Processing...
-        chars = segment(img);
-        ansString = zeros(length(chars), 1);
-        for i = 1:length(chars)
-            answer = capstoneClassify(chars{i}, svmMatrix, labels);
-            ansString(i) = answer
-        end
-        
+        [chars ave stdev] = segment(img);
+        answer = capstoneClassify(chars, labels, reducFact, nVecs, model);
+               
         % Post-Processing
-        img = im2bw(img); % just for effect
-        imwrite(img, sentFileName);
-        fprintf(ansFile, '%s', mat2str(ansString));
+        procImg = drawBoundingBoxes(img, ave, stdev);
+        imwrite(procImg, sentFileName);
+        fprintf(ansFile, '%s', mat2str(answer));
         fclose(ansFile);
-        disp(['Answer:' mat2str(ansString)]);
+        disp(['Answer:' mat2str(answer)]);
         disp('Done!');
         disp('');
     end

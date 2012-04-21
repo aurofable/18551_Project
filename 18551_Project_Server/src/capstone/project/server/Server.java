@@ -74,7 +74,7 @@ public class Server {
 				// Wait for it to be processed
 				while (initSentTime >= sentFile.lastModified()) {
 					sentFile = new File(sent);
-					Thread.sleep( (long) 100 );
+					Thread.sleep( (long) 1000 );
 				}
 				
 				// Processed, send the processed file

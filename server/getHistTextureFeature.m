@@ -4,8 +4,8 @@
 function vec = getHistTextureFeature(img)
 [dimY dimX] = size(img);
 
-rowDiv = 8;
-colDiv = 8;
+rowDiv = 4;
+colDiv = 4;
 
 vec = zeros(1, rowDiv * colDiv);
 index = 0;
@@ -16,8 +16,8 @@ for i = 1:rowDiv
         xStart = ((j-1)*dimX/colDiv)+1;
         sector = imcrop(img, [xStart yStart dimX/colDiv dimY/rowDiv]);
         sector = histeq(sector);
-        vec(index) = mean(mean(sector));
-    end 
+        vec(index) = mean(mean(sector))/255;
+    end
 end
 end
 

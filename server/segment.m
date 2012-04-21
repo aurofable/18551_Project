@@ -2,11 +2,9 @@
 % Segmentation script
 
 
-function chars = segment(img)
+function [chars  ave stdev] = segment(img)
 imgray = rgb2gray(img);
-%imgray = histeq(imgray);
-imgbin = im2bw(imgray);
-imgbin = ~imgbin;
+imgbin = ~im2bw(imgray);
 
 [image num] = bwlabel(imgbin);
 stats = regionprops(image, 'BoundingBox');
@@ -19,10 +17,27 @@ for i = 1:num
         continue
     end
     charImg = imcrop(imgbin, stats(i).BoundingBox);
-    charImg = imresize(charImg, [128 128]);
-    charImg = ~charImg .* 255;
-    %charImg = histeq(charImg);
-    chars{charCnt} = charImg;
+    %charImg = imresize(charImg, [128 128]);
+    chars{charCnt} = ~charImg;
     charCnt = charCnt + 1;
 end
+
+areas = zeros(length(chars), 1);
+for i = 1:length(chars)
+    croppedImg = chars{i};
+    [a b] = size(croppedImg);
+    areas(i) = a*b;
+end
+
+% If differs by some margin, remove
+for i = 1:length(chars)
+    s = std(areas);
+    if ((abs(areas(i) - mean(areas)) > 1.5*s))
+        chars{i} = [];
+    else chars{i} = imresize(chars{i}, [128 128]);
+    end
+end
+chars = chars(~cellfun(@isempty, chars));
+ave = mean(areas);
+stdev = s;
 end

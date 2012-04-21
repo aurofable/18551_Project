@@ -7,9 +7,9 @@ load FntData;
 %labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
 %    'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
 
-labels = 0:3;
-numTrainingSamples = 700;
-features = 64;
+labels = 0:4;
+numTrainingSamples = 200;
+features = 85;
 
 % Preparing the data to train
 svmMatrix = cell(length(labels));
@@ -23,13 +23,15 @@ for i = 1:length(labels)
        end
        
        % Training it such that i is positive, j is negative
-       iChar = imgDataTrain{i};
-       jChar = imgDataTrain{j};
+       iChar = imgDataTrain{i}; % Training on noisy
+       jChar = imgDataTrain{j}; % Training on noisy
        iTrainingDataSet = zeros(numTrainingSamples, features);
        jTrainingDataSet = zeros(numTrainingSamples, features);
        for k = 1:numTrainingSamples
-           iTrainingDataSet(k,:) = getHistTextureFeature(iChar{k});
-           jTrainingDataSet(k,:) = getHistTextureFeature(jChar{k});
+           iTrainingDataSet(k,:) = feature_extractor(iChar{k})';
+           jTrainingDataSet(k,:) = feature_extractor(jChar{k})';
+           %iTrainingDataSet(k,:) = getHistTextureFeature(iChar{k});
+           %jTrainingDataSet(k,:) = getHistTextureFeature(jChar{k});
        end
        trainingDataSet = [iTrainingDataSet; jTrainingDataSet];
        groupings = [ones(numTrainingSamples, 1); zeros(numTrainingSamples, 1)];

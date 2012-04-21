@@ -1,27 +1,61 @@
 % Spring 2012, 18-551 Project
 % Testing Script
 
-load svmTrain.mat;
+%clear all;
+%load svmTrain.mat
+%load svmTrainLibSVM.mat
+%load FntData.mat
 
-numTestSamples = 20;
+% Testing
+numTestSamples = 200;
+numNoisy = 100;
 
-numCorrect = 0;
+% Debugging vars
 debug = [];
 
-for i = 1:length(labels)
-    testSet = imgDataTest{i};
-   for j = 1:numTestSamples
-      sample = testSet{j};
-      answer = capstoneClassify(sample, svmMatrix, labels);
-      if (answer == i - 1)
-          numCorrect = numCorrect + 1;
-      else
-          ref = imgDataTrain{answer + 1};
-          debugRow = [sample ref{1}];
-          debug = [debug; debugRow];
-      end
-   end
+% Preprocessing data
+testLabels = ones(numTestSamples * m, 1);
+for i = 1:m
+    testLabels((i-1)*numTestSamples+1:i*numTestSamples) = i*ones(numTestSamples, 1);
 end
 
-percentage = numCorrect / (numTestSamples * length(labels));
-imshow(debug);
+% Generating Testing Data
+% dataIndex = 0;
+% testData = ones(numTestSamples * m, n);
+% for i = 1:m
+%     char = imgDataTest{i};
+%     for j = 1:numTestSamples
+%         dataIndex = dataIndex + 1;
+%         img = char{j};
+%         featureVec = getSkeletonZoneFeature(img, rowDiv, colDiv);
+%         testData(dataIndex, :) = featureVec;
+%     end
+% end
+
+testData = dimRedTest(imgDataTest, numTestSamples, m, nVecs, numNoisy, imgDataTestNoisy);
+testData = (testData - repmat(min(testData,[],1),size(testData,1),1))*spdiags(1./(max(testData,[],1)-min(testData,[],1))',0,size(testData,2),size(testData,2));
+
+% Running the Test
+[predLabel accuracy decision_vals] = svmpredict(testLabels, testData, model);
+
+%correct = length(find(predLabel - testLabels == 0))/length(testLabels);
+% for i = 1:length(labels)
+%     testSet = imgDataTest{i};
+%    for j = 1:numTestSamples
+%       sample = testSet{j};
+%       
+%       answer = model
+%       %answer = capstoneClassify(sample, svmMatrix, labels);
+%       %answer = labels(answer);
+%       if (answer == i - 1)
+%           numCorrect = numCorrect + 1;
+%       else
+%           ref = imgDataTrain{answer + 1};
+%           debugRow = [sample ref{1}];
+%           debug = [debug; debugRow];
+%       end
+%    end
+% end
+
+% percentage = numCorrect / (numTestSamples * length(labels));
+% imshow(debug);
