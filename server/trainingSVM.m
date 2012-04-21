@@ -5,18 +5,20 @@
 clear all;
 load FntData;
 load FntDataNoisy;
+load rawData;
 
-labels = 0:9; % Actual label vector
-numTrainingSamplesPerChar = 700;
+labels = 0:2; % Actual label vector
+numTrainingSamplesPerChar = 100;
 
 % Implementing Zoning
-colDiv = 5;
-rowDiv = 5;
-n = colDiv * rowDiv; % Features
+colDiv = 4;
+rowDiv = 4;
+n = colDiv * rowDiv; % Feature
+n = 32;
 m = length(labels);  % Num Classes;
 
 % Preprocessing data
-minNumTrainingSamplesPerChar = 100;
+minNumTrainingSamplesPerChar = 0;
 if (numTrainingSamplesPerChar < minNumTrainingSamplesPerChar)
     numTrainingSamplesPerChar = minNumTrainingSamplesPerChar;
 end
@@ -52,8 +54,8 @@ end
 % end
 
 % Generating Data and Reducing Dimensions
-reducFact = 0.25; % Reduction factor
-[trainingData nVecs cummulVar] = dimRed(imgDataTrain, n, numTrainingSamplesPerChar, m, reducFact, minNumTrainingSamplesPerChar, imgDataTestNoisy);
+reducFact = 0.125; % Reduction factor
+[trainingData nVecs cummulVar] = dimRed(imgDataRawTrain, n, numTrainingSamplesPerChar, m, reducFact, minNumTrainingSamplesPerChar, imgDataTestNoisy, rowDiv, colDiv);
 
 % Normalizing Features
 trainingData = (trainingData - repmat(min(trainingData,[],1),size(trainingData,1),1))*spdiags(1./(max(trainingData,[],1)-min(trainingData,[],1))',0,size(trainingData,2),size(trainingData,2));
@@ -74,5 +76,5 @@ end
 % Training SVM
 cmd = ['-t 2 -c ', num2str(bestc), ' -g ', num2str(bestg)];
 model = svmtrain(trainingLabels, trainingData, cmd);
-clearvars -except model imgDataTrain imgDataTest imgDataTestNoisy labels m n rowDiv colDiv trainingLabels trainingData nVecs varCap reducFact cummulVar;
+clearvars -except model imgDataRawTrain imgDataRawTest imgDataTrain imgDataTest imgDataTestNoisy labels m n rowDiv colDiv trainingLabels trainingData nVecs varCap reducFact cummulVar;
 save svmTrainLibSVM.mat;

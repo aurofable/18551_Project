@@ -42,7 +42,7 @@ while (running == 1)
         
         % Processing...
         [chars ave stdev] = segment(img);
-        answer = capstoneClassify(chars, labels, reducFact, nVecs, model);
+        answer = capstoneClassify(chars, labels, reducFact, nVecs, model, rowDiv, colDiv);
                
         % Post-Processing
         procImg = drawBoundingBoxes(img, ave, stdev);

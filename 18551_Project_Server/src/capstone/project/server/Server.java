@@ -34,6 +34,7 @@ public class Server {
 		DataInputStream dataInputStream = null;
 		DataOutputStream dataOutputStream = null;
         BufferedReader reader = null;
+        boolean breakOut = false;
 
 		try {
 			serverSocket = new ServerSocket(port);
@@ -71,14 +72,20 @@ public class Server {
 				ImageIO.write(image, "jpg", receivedFile);
 				System.out.println("\tSaved File ");
 				
-				// Wait for it to be processed
+				// Wait 20s for it to be processed
+				long startProc = System.currentTimeMillis();
 				while (initSentTime >= sentFile.lastModified()) {
+					if (System.currentTimeMillis() - startProc  > 20*1000) {
+						breakOut = true;
+						System.out.println("\tBreakout!");
+						break;
+					}
 					sentFile = new File(sent);
 					Thread.sleep( (long) 1000 );
 				}
 				
 				// Processed, send the processed file
-				System.out.println("\tFile Processed");
+				if (!breakOut) System.out.println("\tFile Processed");
 				image = ImageIO.read(sentFile);
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 				ImageIO.write( image, "jpg", baos );

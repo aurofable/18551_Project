@@ -1,7 +1,7 @@
 % Spring 2012, 18-551 Project
 % Classification Script
 
-function [answer predLabel] = capstoneClassify(chars, labels, reducFact, nVecs, model)
+function [answer predLabel] = capstoneClassify(chars, labels, reducFact, nVecs, model, rowDiv, colDiv)
 
 if (isempty(chars)) 
     answer = [];
@@ -9,14 +9,17 @@ if (isempty(chars))
 end
 dim = numel(chars{1}) * reducFact * reducFact;
 dim = dim + 256; % for projections
+dim = 64;
 dataInput = zeros(length(chars), dim);
 
 dataIndex = 0;
 for i = 1:length(chars)
     dataIndex = dataIndex + 1;
-    thumbnail = imresize(chars{i}, reducFact);
-    vec = getCompositeFeature(chars{i});
-    dataInput(dataIndex, :) = [reshape(thumbnail, 1, dim-256) vec];
+%     thumbnail = imresize(chars{i}, reducFact);
+%     vec = getCompositeFeature(chars{i});
+%     dataInput(dataIndex, :) = [reshape(thumbnail, 1, dim-256) vec];
+%         dataInput(dataIndex, :) = getCompositeFeature(char{i});
+        dataInput(dataIndex, :) = getSkeletonZoneFeature(chars{i}, rowDiv, colDiv);
 end
 
 dataInput = dataInput * nVecs;

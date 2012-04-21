@@ -5,10 +5,11 @@
 %load svmTrain.mat
 %load svmTrainLibSVM.mat
 %load FntData.mat
+load rawData.mat
 
 % Testing
-numTestSamples = 200;
-numNoisy = 100;
+numTestSamples = 20;
+numNoisy = 0;
 
 % Debugging vars
 debug = [];
@@ -30,9 +31,10 @@ end
 %         featureVec = getSkeletonZoneFeature(img, rowDiv, colDiv);
 %         testData(dataIndex, :) = featureVec;
 %     end
-% end
+% end 
 
-testData = dimRedTest(imgDataTest, numTestSamples, m, nVecs, numNoisy, imgDataTestNoisy);
+%imgDataRawTest imgDataRawTrain
+testData = dimRedTest(imgDataRawTest, numTestSamples, m, reducFact, nVecs, numNoisy, imgDataTestNoisy, rowDiv, colDiv);
 testData = (testData - repmat(min(testData,[],1),size(testData,1),1))*spdiags(1./(max(testData,[],1)-min(testData,[],1))',0,size(testData,2),size(testData,2));
 
 % Running the Test

@@ -6,7 +6,7 @@ display = [];
 displayRow = [];
 for i = 1:length(char)
     displayRow = [displayRow char{i}];
-    if (mod(i, 3) == 0) 
+    if (mod(i, 5) == 0) 
         display = [display; displayRow];
         displayRow = [];
     end

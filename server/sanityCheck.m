@@ -6,4 +6,4 @@
 img = imread('received.jpg');
 chars = segment(img);
 displayChars(chars);
-[answer predLabel] = capstoneClassify(chars, labels, reducFact, nVecs, model)
+[answer predLabel] = capstoneClassify(chars, labels, reducFact, nVecs, model, rowDiv, colDiv)
