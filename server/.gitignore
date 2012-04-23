@@ -1,3 +1,4 @@
 *.mat
 !FntData.mat
 !rawData.mat
+!segData.mat

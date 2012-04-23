@@ -6,15 +6,16 @@ clear all;
 load FntData;
 load FntDataNoisy;
 load rawData;
+load segData;
 
-labels = 0:2; % Actual label vector
-numTrainingSamplesPerChar = 100;
+labels = 0:9; % Actual label vector
+numTrainingSamplesPerChar = 700;
 
 % Implementing Zoning
 colDiv = 4;
 rowDiv = 4;
 n = colDiv * rowDiv; % Feature
-n = 32;
+n = 50;
 m = length(labels);  % Num Classes;
 
 % Preprocessing data
@@ -29,36 +30,21 @@ for i = 1:m
     trainingLabels((i-1)*numTrainingSamplesPerChar+1:i*numTrainingSamplesPerChar) = i*ones(numTrainingSamplesPerChar, 1);
 end
 
-% % Generating Data
-% dataIndex = 0;
-% trainingData = ones(numTrainingSamplesPerChar * m, n);
-% for i = 1:m
-%     
-%     % Noisy Images
-%     char = imgDataTestNoisy{i};
-%     for j = 1:minNumTrainingSamplesPerChar
-%         dataIndex = dataIndex + 1;
-%         img = char{end - j};
-%         featureVec = getSkeletonZoneFeature(img, rowDiv, colDiv);
-%         trainingData(dataIndex, :) = featureVec;
-%     end
-%     
-%     % Clean Images
-%     char = imgDataTrain{i};
-%     for j = 1:numTrainingSamplesPerChar-minNumTrainingSamplesPerChar
-%         dataIndex = dataIndex + 1;
-%         img = char{j};
-%         featureVec = getSkeletonZoneFeature(img, rowDiv, colDiv);
-%         trainingData(dataIndex, :) = featureVec;
-%     end
-% end
-
 % Generating Data and Reducing Dimensions
 reducFact = 0.125; % Reduction factor
-[trainingData nVecs cummulVar] = dimRed(imgDataRawTrain, n, numTrainingSamplesPerChar, m, reducFact, minNumTrainingSamplesPerChar, imgDataTestNoisy, rowDiv, colDiv);
+%[trainingData nVecs cummulVar] = dimRed(imgDataTrain, n, numTrainingSamplesPerChar, m, reducFact, minNumTrainingSamplesPerChar, imgDataTestNoisy, rowDiv, colDiv);
+[trainingData nVecs cummulVar] = dimRed(imgDataTrainSeg, n, numTrainingSamplesPerChar, m, reducFact, minNumTrainingSamplesPerChar, imgDataTestNoisy, rowDiv, colDiv);
 
 % Normalizing Features
-trainingData = (trainingData - repmat(min(trainingData,[],1),size(trainingData,1),1))*spdiags(1./(max(trainingData,[],1)-min(trainingData,[],1))',0,size(trainingData,2),size(trainingData,2));
+%trainingData = (trainingData - repmat(min(trainingData,[],1),size(trainingData,1),1))*spdiags(1./(max(trainingData,[],1)-min(trainingData,[],1))',0,size(trainingData,2),size(trainingData,2));
+%meanTraining = mean(trainingData);
+%stdev = std(trainingData);
+%hm = trainingData;
+%trainingData = (trainingData - repmat(meanTraining, size(trainingData, 1), 1))./repmat(stdev, size(trainingData, 1), 1);
+minimums = min(trainingData, [], 1);
+ranges = max(trainingData, [], 1) - minimums;
+trainingData = (trainingData - repmat(minimums, size(trainingData, 1), 1)) ./ repmat(ranges, size(trainingData, 1), 1);
+
 
 % Code to find params
 bestcv = 0;
@@ -73,8 +59,9 @@ for log2c = -1.1:3.3,
   end
 end
 
+
 % Training SVM
 cmd = ['-t 2 -c ', num2str(bestc), ' -g ', num2str(bestg)];
 model = svmtrain(trainingLabels, trainingData, cmd);
-clearvars -except model imgDataRawTrain imgDataRawTest imgDataTrain imgDataTest imgDataTestNoisy labels m n rowDiv colDiv trainingLabels trainingData nVecs varCap reducFact cummulVar;
+clearvars -except model imgDataRawTrain imgDataRawTest imgDataTrain imgDataTest imgDataTestNoisy labels m n rowDiv colDiv trainingLabels trainingData nVecs varCap reducFact cummulVar meanTraining stdev minimums ranges;
 save svmTrainLibSVM.mat;

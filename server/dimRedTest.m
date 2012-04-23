@@ -8,7 +8,9 @@ function [dataSet] = dimRedTest(data, numSamplesPerChar, numClasses, reducFact, 
 char = data{1};
 dim = numel(char{1}) * reducFact * reducFact;
 dim = dim + 256; % For projections
-dim = 64;
+dim = 32*4 + 16 + 128*128*3 + 128*128 + 128*128;
+% elliptical, zoning, gaussian, log, gabors
+dim = 32*4 + 16;
 
 % Formatting dataInput
 dataInput = zeros(numSamplesPerChar * numClasses, dim);
@@ -23,7 +25,28 @@ for i = 1:numClasses
 %         vec = getCompositeFeature(char{end - j});
 %         dataInput(dataIndex, :) = [reshape(thumbnail, 1, dim-256) vec];
 %         dataInput(dataIndex, :) = getCompositeFeature(char{end - j});
-        dataInput(dataIndex, :) = getSkeletonZoneFeature(char{end - j}, rowDiv, colDiv);
+%        dataInput(dataIndex, :) = getSkeletonZoneFeature(char{end - j}, rowDiv, colDiv);
+
+        % Data should have grayscale and binary
+        % Assume image is grayscale (ie imgData...not raw)
+        %charBW = im2bw(char{j}); %IF NOT RAW THEN UNCOMMENT
+        charBW = char{j}; % IF RAW UNCOMMENT
+        %charGray = histeq(char{j}); %IF NOT RAW THEN UNCOMMENT
+        charGray = char{j}; % IF RAW UNCOMMENT
+        
+        % Creating feature vector
+        % Elliptical
+        outline = getOutline(charBW);
+        rFSDs = fEfourier(outline, 32, 1, 1);
+        curveVec = reshape(rFSDs, 1, 32*4);
+        
+        % Zoning
+        zonVec = getSkeletonZoneFeature(charBW, rowDiv, colDiv);
+        
+        % Filters
+        %filtVec = getFilterBankFeature(charGray);
+        %dataInput(dataIndex, :) = [curveVec zonVec filtVec];
+        dataInput(dataIndex, :) = [curveVec zonVec];
     end
     
     % Clean Images
@@ -34,7 +57,28 @@ for i = 1:numClasses
 %         vec = getCompositeFeature(char{j});
 %         dataInput(dataIndex, :) = [reshape(thumbnail, 1, dim-256) vec];
 %         dataInput(dataIndex, :) = getCompositeFeature(char{j});
-        dataInput(dataIndex, :) = getSkeletonZoneFeature(char{j}, rowDiv, colDiv);
+%        dataInput(dataIndex, :) = getSkeletonZoneFeature(char{j}, rowDiv, colDiv);
+        
+        % Data should have grayscale and binary
+        % Assume image is grayscale (ie imgData...not raw)
+        %charBW = im2bw(char{j}); %IF NOT RAW THEN UNCOMMENT
+        charBW = char{j}; % IF RAW UNCOMMENT
+        %charGray = histeq(char{j}); %IF NOT RAW THEN UNCOMMENT
+        charGray = char{j}; % IF RAW UNCOMMENT
+        
+        % Creating feature vector
+        % Elliptical
+        outline = getOutline(charBW);
+        rFSDs = fEfourier(outline, 32, 1, 1);
+        curveVec = reshape(rFSDs, 1, 32*4);
+        
+        % Zoning
+        zonVec = getSkeletonZoneFeature(charBW, rowDiv, colDiv);
+        
+        % Filters
+        %filtVec = getFilterBankFeature(charGray);
+        %dataInput(dataIndex, :) = [curveVec zonVec filtVec];
+        dataInput(dataIndex, :) = [curveVec zonVec];
     end
 end
 

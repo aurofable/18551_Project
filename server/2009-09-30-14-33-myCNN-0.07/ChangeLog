@@ -1,0 +1,33 @@
+2009-09-30-14-33 myCNN-0.07
+  - a graphical demo (demo_myCNN) added (thanks to Mikhail Sitotenko, 
+    http://www.mathworks.com/matlabcentral/fileexchange/24291)
+  - an example of pretrained network (myLeNet5-example.mat) with
+    a new M-layer added
+  - the myCNN constructor is fixed (now it is possible to properly load
+    myCNN objects from a mat file)
+
+2009-09-28-14-30 myCNN-0.06
+  - the first attempt to make the M-layer trainable
+  - a couple of new private functions unfold.m and unfold2.m added
+  - soft_max now suppots n-dimensional array (not only 2D and 3D)
+  - a little clean-up of the code
+  - more eleborated myCNN object description (myCNN-description.pdf)
+	
+2009-09-23-11-38 myCNN-0.05
+  - bug in init_net (weights initialiazation) is fixed
+  - example2.m added
+  - doc folder added
+  - first attempt to document the myCNN object doc/myCNN-description.pdf
+
+2009-09-09-09-09 myCNN-0.04
+  - ChangeLog added
+
+2009-09-08-09-59 myCNN-0.03
+  - content.m added
+  - read_idx_data.m fixed
+
+2009-09-07-22-54 myCNN-0.02
+  - example got comments
+
+ 2009-09-07-04-11 myCNN-0.01
+  - first release, sumbitted to Mathworks FileExchange

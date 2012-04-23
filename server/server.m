@@ -26,6 +26,7 @@ for i = 1:length(fileStats)
     end
 end
 touchtime = fileStats(fileIndex).datenum;
+disp('Server ready');
 
 while (running == 1)
     fileStats = dir;
@@ -41,8 +42,8 @@ while (running == 1)
         img = imread(receivedFileName);
         
         % Processing...
-        [chars ave stdev] = segment(img);
-        answer = capstoneClassify(chars, labels, reducFact, nVecs, model, rowDiv, colDiv);
+        [charsBW charsGray ave stdev] = segment(img);
+        answer = capstoneClassify(charsBW, charsGray, labels, reducFact, nVecs, model, rowDiv, colDiv, ranges, minimums);
                
         % Post-Processing
         procImg = drawBoundingBoxes(img, ave, stdev);
