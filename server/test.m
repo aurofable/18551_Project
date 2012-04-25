@@ -7,10 +7,10 @@ load svmTrainLibSVM.mat
 load FntData.mat
 load rawData.mat
 load segData.mat
-load svmT'rainLibSVM (2)'
+%load svmT'rainLibSVM (2)'
 
 % Testing
-numTestSamples = 20;
+numTestSamples = 200;
 numNoisy = 0;
 
 % Debugging vars
@@ -23,7 +23,7 @@ for i = 1:m
 end
 
 %imgDataRawTest imgDataRawTrain
-testData = dimRedTest(imgDataTestSeg, numTestSamples, m, reducFact, nVecs, numNoisy, imgDataTestNoisy, rowDiv, colDiv);
+testData = dimRedTest(imgDataTestSeg, imgDataTestSegGray, numTestSamples, m, reducFact, nVecs, numNoisy, imgDataTestNoisy, rowDiv, colDiv);
 %testData = (testData - repmat(min(testData,[],1),size(testData,1),1))*spdiags(1./(max(testData,[],1)-min(testData,[],1))',0,size(testData,2),size(testData,2));
 %testData = (testData - repmat(meanTraining, size(testData, 1), 1))./repmat(stdev, size(testData, 1), 1);
 testData = (testData - repmat(minimums, size(testData, 1), 1)) ./ repmat(ranges, size(testData, 1), 1);

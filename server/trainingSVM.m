@@ -4,19 +4,20 @@
 
 clear all;
 load FntData;
-load FntDataNoisy;
+%load FntDataNoisy;
 load rawData;
 load segData;
+imgDataTestNoisy = {};
 
 %labels = 0:9; % Actual label vector
 labels = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 numTrainingSamplesPerChar = 700;
 
 % Implementing Zoning
-colDiv = 4;
-rowDiv = 4;
+colDiv = 8;
+rowDiv = 8;
 n = colDiv * rowDiv; % Feature
-n = 100;
+n = 256;
 m = length(labels);  % Num Classes;
 
 % Preprocessing data
@@ -34,7 +35,7 @@ end
 % Generating Data and Reducing Dimensions
 reducFact = 0.125; % Reduction factor
 %[trainingData nVecs cummulVar] = dimRed(imgDataTrain, n, numTrainingSamplesPerChar, m, reducFact, minNumTrainingSamplesPerChar, imgDataTestNoisy, rowDiv, colDiv);
-[trainingData nVecs cummulVar] = dimRed(imgDataTrainSeg, n, numTrainingSamplesPerChar, m, reducFact, minNumTrainingSamplesPerChar, imgDataTestNoisy, rowDiv, colDiv);
+[trainingData nVecs cummulVar] = dimRed(imgDataTrainSeg, imgDataTrainSegGray, n, numTrainingSamplesPerChar, m, reducFact, minNumTrainingSamplesPerChar, imgDataTestNoisy, rowDiv, colDiv);
 
 % Normalizing Features
 %trainingData = (trainingData - repmat(min(trainingData,[],1),size(trainingData,1),1))*spdiags(1./(max(trainingData,[],1)-min(trainingData,[],1))',0,size(trainingData,2),size(trainingData,2));
@@ -62,7 +63,7 @@ end
 
 
 % Training SVM
-cmd = ['-t 2 -c ', num2str(bestc), ' -g ', num2str(bestg)];
+cmd = ['-t 0 -c ', num2str(bestc), ' -g ', num2str(bestg)];
 model = svmtrain(trainingLabels, trainingData, cmd);
-clearvars -except model imgDataRawTrain imgDataRawTest imgDataTrain imgDataTest imgDataTestNoisy labels m n rowDiv colDiv trainingLabels trainingData nVecs varCap reducFact cummulVar meanTraining stdev minimums ranges;
+clearvars -except model imgDataTrainSeg imgDataTrainSegGray imgDataTestSeg imgDataTestSegGray imgDataRawTrain imgDataRawTest imgDataTrain imgDataTest imgDataTestNoisy labels m n rowDiv colDiv trainingLabels trainingData nVecs varCap reducFact cummulVar meanTraining stdev minimums ranges;
 save svmTrainLibSVM.mat;
