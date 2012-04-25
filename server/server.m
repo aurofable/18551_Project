@@ -9,6 +9,7 @@
 clear all;
 %load svmTrain.mat
 load svmTrainLibSVM.mat
+load svmT'rainLibSVM (2)'
 
 receivedFileName = 'received.jpg';
 sentFileName = 'sent.jpg';

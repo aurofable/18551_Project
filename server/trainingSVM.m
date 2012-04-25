@@ -8,14 +8,15 @@ load FntDataNoisy;
 load rawData;
 load segData;
 
-labels = 0:9; % Actual label vector
+%labels = 0:9; % Actual label vector
+labels = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 numTrainingSamplesPerChar = 700;
 
 % Implementing Zoning
 colDiv = 4;
 rowDiv = 4;
 n = colDiv * rowDiv; % Feature
-n = 50;
+n = 100;
 m = length(labels);  % Num Classes;
 
 % Preprocessing data

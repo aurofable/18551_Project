@@ -7,7 +7,8 @@ img = imread('received.jpg');
 [charsBW charsGray] = segment(img);
 displayChars(charsBW);
 displayChars(charsGray);
-[answer predLabel] = capstoneClassify(charsBW, charsGray, labels, reducFact, nVecs, model, rowDiv, colDiv, ranges, minimums)
+[answer predLabel] = capstoneClassify(charsBW, charsGray, labels, reducFact, nVecs, model, rowDiv, colDiv, ranges, minimums);
+answer
 
 % THINK ABOUT GRAYSCALE....
 % WHAT DATA ARE YOU TRAINING ON AND WHAT DATA ARE YOU GETTING....

@@ -3,13 +3,14 @@
 
 %clear all;
 %load svmTrain.mat
-%load svmTrainLibSVM.mat
-%load FntData.mat
+load svmTrainLibSVM.mat
+load FntData.mat
 load rawData.mat
 load segData.mat
+load svmT'rainLibSVM (2)'
 
 % Testing
-numTestSamples = 200;
+numTestSamples = 20;
 numNoisy = 0;
 
 % Debugging vars

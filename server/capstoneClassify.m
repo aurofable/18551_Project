@@ -49,8 +49,5 @@ dataInput = (dataInput - repmat(minimums, size(dataInput, 1), 1)) ./ repmat(rang
 testLabels = randi(100, length(charsBW), 1); % Does not matter
 [predLabel accuracy ~] = svmpredict(testLabels, dataInput, model);
 
-answer = zeros(1, length(charsBW));
-for i = 1:length(predLabel)
-    answer(i) = labels(predLabel(i));
-end
+answer = labels(predLabel);
 end
