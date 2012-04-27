@@ -5,11 +5,11 @@
 clear all;
 load segData;
 
-labels = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'; % Actual label vector
+labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'; % Actual label vector
 numTrainingSamplesPerChar = 700;
 
 % Implementing Zoning
-n = 256; % Num Features
+n = 52; % Num Features
 m = length(labels);  % Num Classes;
 imageSize = [128 128];
 
