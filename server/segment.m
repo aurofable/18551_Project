@@ -1,5 +1,6 @@
 % Spring 2012, 18-551 Project
 % Segmentation script
+% James Chun, jtchun@andrew.cmu.edu
 
 
 function [charsBW charsGray ave stdev] = segment(img)
