@@ -53,7 +53,7 @@ for i = 1:numClasses
 end
 
 % PCA
-[COEFF, ~, LATENT] = princomp(dataInput);
+[COEFF, SCORE, LATENT] = princomp(dataInput);
 cummulVar = cumsum(diag(LATENT))/sum(diag(LATENT));
 
 % Getting the first n eigenvectors
