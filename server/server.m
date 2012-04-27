@@ -8,9 +8,9 @@
 
 clear all;
 %load svmTrain.mat
-load svmTrainLibSVM.mat
+%load svmTrainLibSVM.mat
 %load svmT'rainLibSVM (2)'
-load svmTrainLibSVM256.mat
+%load svmTrainLibSVM256.mat
 
 receivedFileName = 'received.jpg';
 sentFileName = 'sent.jpg';
