@@ -17,11 +17,10 @@ charCnt = 0;
 cornerPointsX = [];
 cornerPointsY = [];
 for i = 1:num
-    if (stats(i).BoundingBox(3)*stats(i).BoundingBox(4) < 100) 
+    if (stats(i).BoundingBox(3)*stats(i).BoundingBox(4) < 500) 
         continue
     end
     charCnt = charCnt + 1;
-    %charImg = imresize(charImg, [128 128]);
     cornerPointsX = [cornerPointsX stats(i).BoundingBox(1)];
     cornerPointsY = [cornerPointsY stats(i).BoundingBox(2)];
     charsBW{charCnt} = ~imcrop(imgbin, stats(i).BoundingBox);
