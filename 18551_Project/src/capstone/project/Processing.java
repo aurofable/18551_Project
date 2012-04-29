@@ -17,6 +17,7 @@ import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
+import org.opencv.core.Core.MinMaxLocResult;
 import org.opencv.imgproc.Imgproc;
 
 import android.graphics.Bitmap;
@@ -87,7 +88,10 @@ public class Processing implements Runnable{
 		res = getCC(rot);
 		
 		// Check each segmented char with template
-		String answer = templateMatch();
+		String answer = "";
+		if (mode == 0)
+			answer = templateMatch(); 
+		else answer = corrMatch();
 		System.out.println("ANSWER: " + answer);
 		
 		
@@ -584,50 +588,95 @@ public class Processing implements Runnable{
 		char[] labels = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
 		String res = "";
 		int numFilters = 36;
-		Mat[] templates = new Mat[numFilters];
+		Mat[] filters = new Mat[numFilters];
 		Size stdSize = new Size(32, 32);
 		double[][] results = new double[charMatList.size()][numFilters];
 		
 		// Creating all templates
-		for (int i = 0; i < numFilters; i++) {
-			System.out.println("Creating filter bank" + (int)(i+1));
-			String path = "transOptic/corrFilters/" + (int)(i+1) + ".jpg";
+		for (int i = 10; i < numFilters; i++) {
+			System.out.println("Creating filter bank " + (int)(i+1));
+			String path = "transOptic/corrFilter/" + (int)(i+1) + ".jpg";
 			File imageFile = new File(Environment.getExternalStorageDirectory(), path);
 			if (!imageFile.exists()) return null;
 			
 			BitmapFactory.Options options = new BitmapFactory.Options();
 			options.inPreferredConfig = Bitmap.Config.ARGB_8888;
 			Bitmap bitmap = BitmapFactory.decodeFile(imageFile.getAbsolutePath(), options);
-			templates[i] = Utils.bitmapToMat(bitmap);
+			Mat temp = Utils.bitmapToMat(bitmap);
+			Imgproc.cvtColor(temp, temp, Imgproc.COLOR_BGR2GRAY, 1);
+			
+			System.out.println("CV TYPE " + temp.type());
+			System.out.println("CV Depth " + temp.depth());
+			System.out.println("CV Channels " + temp.channels());
+			temp.convertTo(temp, CvType.CV_32FC1, 255);
+			
+			filters[i] = temp;
+			Imgproc.resize(filters[i], filters[i], stdSize);
 			bitmap.recycle();
 			System.gc();
 		}
-		System.out.println("Created Templates");
+		System.out.println("Created Filters");
 		
 		// Matching
 		for (int i = 0; i < charMatList.size(); i++) {
 			// Resize segmented image to standard size, convert to grayscale
-			Mat ch = charMatList.get(i);
+			Mat ch = charMatList.get(i).clone();
 			Imgproc.resize(ch, ch, stdSize);
 			Imgproc.cvtColor(ch, ch, Imgproc.COLOR_BGR2GRAY, 1);
-			Imgproc.cvtColor(ch, ch, Imgproc.COLOR_GRAY2RGBA, 4);
+			//Imgproc.cvtColor(ch, ch, Imgproc.COLOR_GRAY2RGBA, 4);
 			
-			double maxCorr = 0;
+			/*
+			System.out.println("CV TYPE " + ch.type());
+			System.out.println("CV Depth " + ch.depth());
+			System.out.println("CV Channels " + ch.channels());
+			*/
+			
+			ch.convertTo(ch, CvType.CV_32FC1, 255);
+			
+			System.out.println("CV TYPE " + ch.type());
+			System.out.println("CV Depth " + ch.depth());
+			System.out.println("CV Channels " + ch.channels());
+			
+			double maxPSR = 0;
 			int maxIndex = 0;
-			for (int j = 0; j < numFilters; j++) {
-				Mat result = new Mat();
+			for (int j = 10; j < numFilters; j++) {
+				// Calculating the correlation
+				Mat temp = new Mat();
+				Mat chFFT = new Mat();
+				Core.dft(ch, chFFT);
+				Core.mulSpectrums(chFFT, filters[j], temp, Core.DFT_ROWS);
+				Core.dft(temp, temp, Core.DFT_INVERSE);
+				Core.normalize(temp, temp);
 				
-				// Simple template matching for now
-				Imgproc.matchTemplate(ch, templates[j], result, 2);
-				double corr = result.get(0,0)[0];
-				if (corr > maxCorr) {
+				double corrMax = Core.minMaxLoc(temp).maxVal;
+				Mat mean = new Mat();
+				Mat stddev = new Mat();
+				Core.meanStdDev(temp, mean, stddev);
+				System.out.println("Size of Mean: " + mean.size());
+				System.out.println("Print of Mean: " + printMat(mean));
+				System.out.println("Size of Stddev: " + stddev.size());
+				System.out.println("Print of Stddev: " + printMat(stddev));
+				//double PSR = (corrMax - corrMean[0])/
+				/*
+				// Calculating PSR
+				MinMaxLocResult mmLoc = Core.minMaxLoc(temp);
+				Point maxLoc = mmLoc.maxLoc;
+				double corrMax = mmLoc.maxVal;
+				
+				// Brute Forcing
+				Core.flip(temp, temp, -1);
+				
+				// Setting the internal window to zero
+				Mat window = temp.submat((int)maxLoc.y-2, (int)maxLoc.y+2, (int)maxLoc.x-2, (int)maxLoc.x+2);
+				*/
+				double corrMean = mean.get(0,0)[0];
+				double corrStddev = stddev.get(0,0)[0];
+				double psr = Math.abs((corrMax - corrMean) / corrStddev);
+				if (psr > maxPSR) {
 					maxIndex = j;
-					maxCorr = corr;
+					maxPSR = psr;
 				}
-				//System.out.println("Size of result: " + result.size());
-				//System.out.println("\tResult for image " + i + ", filter " + j + " is " + Arrays.toString(result.get(0, 0)));
 			}
-			
 			res = res + labels[maxIndex];
 		}
 		return res;

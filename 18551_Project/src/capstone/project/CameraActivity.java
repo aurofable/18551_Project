@@ -100,7 +100,7 @@ public class CameraActivity extends Activity {
         	mode = 2;
             break;
         case R.id.SVM: 
-        	t = Toast.makeText(this, "Using an SVM", Toast.LENGTH_SHORT);
+        	t = Toast.makeText(this, "Using an SVM", Toast.LENGTH_SHORT); // NEED TO MAKE THIS
         	mode = 3;
             break;
         default: return true;
