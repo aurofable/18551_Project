@@ -30,6 +30,7 @@ public class Processing implements Runnable{
 	
 	private static final String TAG             = "Capstone::Processing";
 	
+	private int			mode;
 	private byte[]		img;
 	private Mat 		yuv;
 	private Mat			rgba;
@@ -44,7 +45,8 @@ public class Processing implements Runnable{
 	private List<Mat> 	charMatList;
 	private List<Rect>	charRectList;
 	
-	public Processing(Handler handler, boolean viewBinImage, int width, int height, byte[] data){
+	public Processing(Handler handler, int mode, boolean viewBinImage, int width, int height, byte[] data){
+		this.mode = mode;
 		viewBinaryImage = viewBinImage;
 		this.img = data;
 		this.width = width;
@@ -90,6 +92,7 @@ public class Processing implements Runnable{
 		
 		
 		postProcess(res, answer);
+		sendAnswer(answer);
 		writeSegmentedImages();
 		
 		//writeData();
@@ -306,7 +309,7 @@ public class Processing implements Runnable{
 			if (rect.width * rect.height > (m.width() * m.height())/2) // Not too big
 				continue;
 			if (rect.x == 0 || rect.y == 0 || rect.x + rect.width == m.width() || rect.y + rect.height == m.height()) // Get rid of edge contours
-				continue; 
+				continue;
 			if (Math.abs(rect.width - rect.height) > (rect.width + rect.height)/2)
 				continue;
 			
@@ -469,6 +472,13 @@ public class Processing implements Runnable{
 		handler.sendMessage(msg);
 	}
 	
+	private void sendAnswer(String ans) {
+		Message msg = new Message();
+		msg.obj = ans;
+		msg.arg1 = 0;
+		handler.sendMessage(msg);
+	}
+	
 	private void writeSegmentedImages() {
 		
 		// Standard size of 128x128
@@ -523,9 +533,65 @@ public class Processing implements Runnable{
 		double[][] results = new double[charMatList.size()][numFilters];
 		
 		// Creating all templates
-		for (int i = 0; i < 36; i++) {
+		for (int i = 0; i < numFilters; i++) {
 			System.out.println("Creating template " + (int)(i+1));
 			String path = "transOptic/templates/" + (int)(i+1) + ".jpg";
+			File imageFile = new File(Environment.getExternalStorageDirectory(), path);
+			if (!imageFile.exists()) return null;
+			
+			BitmapFactory.Options options = new BitmapFactory.Options();
+			options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+			Bitmap bitmap = BitmapFactory.decodeFile(imageFile.getAbsolutePath(), options);
+			templates[i] = Utils.bitmapToMat(bitmap);
+			bitmap.recycle();
+			System.gc();
+		}
+		System.out.println("Created Templates");
+		
+		// Matching
+		for (int i = 0; i < charMatList.size(); i++) {
+			// Resize segmented image to standard size, convert to grayscale
+			Mat ch = charMatList.get(i);
+			Imgproc.resize(ch, ch, stdSize);
+			Imgproc.cvtColor(ch, ch, Imgproc.COLOR_BGR2GRAY, 1);
+			Imgproc.cvtColor(ch, ch, Imgproc.COLOR_GRAY2RGBA, 4);
+			
+			double maxCorr = 0;
+			int maxIndex = 0;
+			for (int j = 0; j < numFilters; j++) {
+				Mat result = new Mat();
+				
+				// Simple template matching for now
+				// 3, 4, 5 are pretty good
+				Imgproc.matchTemplate(ch, templates[j], result, 5);
+				double corr = result.get(0,0)[0];
+				if (corr > maxCorr) {
+					maxIndex = j;
+					maxCorr = corr;
+				}
+				//System.out.println("Size of result: " + result.size());
+				//System.out.println("\tResult for image " + i + ", filter " + j + " is " + Arrays.toString(result.get(0, 0)));
+			}
+			
+			res = res + labels[maxIndex];
+		}
+		return res;
+	}
+	
+	private String corrMatch() {
+		System.out.println("Initiated correlation matching");
+		
+		char[] labels = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
+		String res = "";
+		int numFilters = 36;
+		Mat[] templates = new Mat[numFilters];
+		Size stdSize = new Size(32, 32);
+		double[][] results = new double[charMatList.size()][numFilters];
+		
+		// Creating all templates
+		for (int i = 0; i < numFilters; i++) {
+			System.out.println("Creating filter bank" + (int)(i+1));
+			String path = "transOptic/corrFilters/" + (int)(i+1) + ".jpg";
 			File imageFile = new File(Environment.getExternalStorageDirectory(), path);
 			if (!imageFile.exists()) return null;
 			
