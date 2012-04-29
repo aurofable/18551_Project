@@ -2,9 +2,10 @@ package capstone.project;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
+import org.opencv.core.Core.MinMaxLocResult;
 import org.opencv.imgproc.Imgproc;
 
 import android.graphics.Bitmap;
@@ -24,12 +26,12 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.widget.Toast;
 
 public class Processing implements Runnable{
 	
 	private static final String TAG             = "Capstone::Processing";
 	
+	private int			mode;
 	private byte[]		img;
 	private Mat 		yuv;
 	private Mat			rgba;
@@ -42,8 +44,10 @@ public class Processing implements Runnable{
 	private String 		text, eigenText, dataText, meanText;
 	private Handler		handler;
 	private List<Mat> 	charMatList;
+	private List<Rect>	charRectList;
 	
-	public Processing(Handler handler, boolean viewBinImage, int width, int height, byte[] data){
+	public Processing(Handler handler, int mode, boolean viewBinImage, int width, int height, byte[] data){
+		this.mode = mode;
 		viewBinaryImage = viewBinImage;
 		this.img = data;
 		this.width = width;
@@ -56,6 +60,7 @@ public class Processing implements Runnable{
 		this.imageName = "temp.jpg";
 		this.handler = handler;
 		this.charMatList = new LinkedList<Mat>();
+		this.charRectList = new LinkedList<Rect>();
 	}
 	
 	public long getProcTime() {
@@ -81,7 +86,17 @@ public class Processing implements Runnable{
 		}
 		
 		res = getCC(rot);
-		postProcess(res);
+		
+		// Check each segmented char with template
+		String answer = "";
+		if (mode == 0)
+			answer = templateMatch(); 
+		else answer = corrMatch();
+		System.out.println("ANSWER: " + answer);
+		
+		
+		postProcess(res, answer);
+		sendAnswer(answer);
 		writeSegmentedImages();
 		
 		//writeData();
@@ -166,8 +181,8 @@ public class Processing implements Runnable{
     	// Getting the gaussian kernel and blurring it
     	// Use camera parameters to get focus distance, length etc to vary kernel size
     	// words need to be big for our thing to work....currently
-    	Size gKernelSize = new Size(17, 17);
-    	double sigma = 10;
+    	Size gKernelSize = new Size(3, 3);
+    	double sigma = 0.25;
     	Imgproc.GaussianBlur(temp, temp, gKernelSize, sigma);
     	
     	// Thresholding
@@ -180,7 +195,6 @@ public class Processing implements Runnable{
     	Imgproc.erode(temp, temp, kernel);
     	Imgproc.dilate(temp, temp, kernel);
     	Imgproc.erode(temp, temp, kernel);
-    	
     	return temp;
 	}
 	
@@ -252,7 +266,6 @@ public class Processing implements Runnable{
 		Mat temp = new Mat();
 		Mat hierarchy = new Mat();
 		List<Mat> contoursAll = new LinkedList<Mat>();
-		List<Mat> contours = new LinkedList<Mat>();
 		List<Mat> rects = new LinkedList<Mat>();
 		
 		// Converting to single channel grayscale
@@ -263,23 +276,14 @@ public class Processing implements Runnable{
     	//Imgproc.resize(temp, temp, downSize);
     	//Imgproc.equalizeHist(temp, temp);
 		
-		Imgproc.findContours(temp, contoursAll, hierarchy, 1, 2);
+		Core.bitwise_not(temp, temp); // Look for "black" connected components 
 		
-		// Removing insignificant contours
-		int numContours = 0;
-		double thresholdArea = 75*75;
-		double totalArea = rgba.width()*rgba.height();
-		System.out.println("Total Area is " + totalArea);
-		for (Mat contour : contoursAll) {
-			double area = Imgproc.contourArea(contour);
-			if (thresholdArea < area && area < totalArea) {
-				System.out.println("Size of Contours: " + contour.size());
-				contours.add(contour);
-				numContours++;
-			}
-		}
+		Imgproc.findContours(temp, contoursAll, hierarchy, 0, 2);
 		
-		System.out.println("Number of Contours is: " + numContours);
+		List<Mat> contours = filterContours(contoursAll);
+		
+		
+		System.out.println("Number of Contours is: " + contours.size());
 		System.out.println("Contours size: " + contours.size());
 		System.out.println("Contours channel: " + contours.get(0).channels());
 		System.out.println("Contours depth: " + contours.get(0).depth());
@@ -288,15 +292,14 @@ public class Processing implements Runnable{
 		
 		Imgproc.drawContours(m, contours, -1, new Scalar(0, 255, 0, 255), 5);
 		
-		for (Mat contour : contours) {
+		for (int i = contours.size() - 1; i >= 0; i--) {
 			Mat approxCurve = new Mat();
+			Mat contour = contours.get(i);
 			Imgproc.approxPolyDP(contour, approxCurve, 3, true);
 			System.out.println("Size of approx Contours: " + approxCurve.size());
 			List<Point> polygon = new LinkedList<Point>();
-			for (int i = 0; i < approxCurve.height(); i++) {
-				//System.out.println("Elem of contours: " + Arrays.toString(approxCurve.get(i, 0)));
-				double[] coord = approxCurve.get(i, 0);
-				System.out.println("THIS IS THE COORD: " + Arrays.toString(coord));
+			for (int j = 0; j < approxCurve.height(); j++) {
+				double[] coord = approxCurve.get(j, 0);
 				Point p = new Point(coord[0], coord[1]);
 				polygon.add(p);
 			}
@@ -304,20 +307,79 @@ public class Processing implements Runnable{
 			// Drawing the Rect
 			Rect rect = Imgproc.boundingRect(polygon);
 			System.out.println("Size of rect: " + rect.size());
+			System.out.println("Dim of rect: " + rect.x + " " + rect.y + " " + rect.height + " " + rect.width);
+			
+			// Additional filtering
+			if (rect.width * rect.height > (m.width() * m.height())/2) // Not too big
+				continue;
+			if (rect.x == 0 || rect.y == 0 || rect.x + rect.width == m.width() || rect.y + rect.height == m.height()) // Get rid of edge contours
+				continue;
+			if (Math.abs(rect.width - rect.height) > (rect.width + rect.height)/2)
+				continue;
+			
 			Mat rectPoints = getAllPointsRect(rect);
 			rects.add(rectPoints);
 			System.out.println("Size of res Mat: " + rectPoints.size());
-			
-			// Extracting the rect
-			Mat roi = m.submat(rect);
-			charMatList.add(roi);
+			charRectList.add(rect);
 		}
 		
-		Imgproc.drawContours(m, rects, -1, new Scalar(255, 0, 0), 5);		
+		// Sort characters from left to right
+		Comparator<Rect> charsInOrder = new Comparator<Rect>() {
+			@Override
+			public int compare(Rect arg0, Rect arg1) {
+				Rect a = (Rect) arg0;
+				Rect b = (Rect) arg1;
+				return a.x - b.x;
+			}
+		};
+		Collections.sort(charRectList, charsInOrder);
 		
-		//Imgproc.cvtColor(temp, temp, Imgproc.COLOR_GRAY2RGBA, 4);
+		for (Rect r : charRectList) {
+			charMatList.add(m.submat(r).clone());
+		}
+		
+		Imgproc.drawContours(m, rects, -1, new Scalar(255, 0, 0), 5);
 		Log.i(TAG, "Found CCs...");
 		return m;
+	}
+	
+	private List<Mat> filterContours(List<Mat> contoursAll) {
+		
+		List<Mat> contours = new LinkedList<Mat>();
+		List<Double> areaVec = new LinkedList<Double>();
+		
+		// Getting the areas
+		double lowerBound = 100*100;
+		double upperBound = rgba.width()*rgba.height();
+		for (int i = contoursAll.size() - 1; i >= 0; i--) {
+			Double area = Imgproc.contourArea(contoursAll.get(i));
+			if (area < lowerBound || area > upperBound) contoursAll.remove(i);
+			else areaVec.add(0, area);
+		}
+		
+		// Finding mean
+		Double meanArea = 0.0;
+		for (Double area : areaVec) {
+			meanArea = meanArea + area;
+		}
+		meanArea = meanArea / areaVec.size();
+		
+		// Finding standard deviation
+		Double stdev = 0.0;
+		for (Double area : areaVec) {
+			stdev = stdev + Math.pow(area - meanArea, 2); 
+		}
+		stdev = Math.pow(stdev / areaVec.size(), 0.5);
+		System.out.println("Mean Area is " + meanArea);
+		System.out.println("Stdev Area is " + stdev);
+		
+		// Removing contours not of the correct size
+		for (int i = 0; i < contoursAll.size(); i++) {
+			if (Math.abs(areaVec.get(i) - meanArea) > 2*stdev) continue;
+			//if (contoursAll.get(i).)
+			contours.add(contoursAll.get(i));
+		}
+		return contours;
 	}
 	
 	// Gets all the points of a rect, as opposed to just its four corners
@@ -369,7 +431,6 @@ public class Processing implements Runnable{
 		return res;
 	}
 	
-	
 	private String printMat(Mat m) {
 		String res = "";
 		for (int i = 0; i < m.height(); i++) {
@@ -383,37 +444,6 @@ public class Processing implements Runnable{
 		return res;
 	}
 	
-	private String printData(Mat data) {
-		String res = "[";
-		for (int i = 0; i < data.height(); i++) {
-			res = res + "[";
-			for (int j = 0; j < data.width(); j++) {
-				double[] pixel = data.get(i, j);
-				res = res + Arrays.toString(pixel);
-			}
-			res = res + "];";
-		}
-		return res + "]";
-	}
-	
-	private void writeData() {
-		File data = new File(Environment.getExternalStorageDirectory(), "data.txt");
-		if (data.exists()) {
-			data.delete();
-		}
-		
-		try {
-			FileWriter writer = new FileWriter(data);
-			writer.append(dataText);
-			writer.flush();
-			writer.close();
-		}
-		catch (IOException e) {
-			Log.e(TAG, "Exception writing to sdcard data");
-		}
-	
-	}
-	
 	private void storeBinImage(Bitmap b) {
 		File photo = new File(Environment.getExternalStorageDirectory(), "bin.jpg");
 		if (photo.exists()) {
@@ -422,6 +452,8 @@ public class Processing implements Runnable{
 		try {
 			FileOutputStream fos = new FileOutputStream(photo.getPath());
 			b.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+			b.recycle();
+			System.gc();
 			fos.flush();
 			fos.close();
 		}
@@ -430,10 +462,11 @@ public class Processing implements Runnable{
 		}
 	}
 	
-	private void postProcess(Mat m) {
+	private void postProcess(Mat m, String answer) {
 		Core.putText(m, text, new Point(20, 150), 3, 1, new Scalar(255, 0, 0, 255), 2);
 		Core.putText(m, eigenText, new Point(20, 200), 3, 1, new Scalar(255, 0, 0, 255), 2);
 		Core.putText(m, meanText, new Point(20, 250), 3, 1, new Scalar(255, 0, 0, 255), 2);
+		Core.putText(m, "Answer: " + answer, new Point(20, 300), 3, 1.5, new Scalar(255, 0, 0, 255), 2);
 	}
 	
 	private void updateDisplay(Bitmap bitmap) {
@@ -443,17 +476,39 @@ public class Processing implements Runnable{
 		handler.sendMessage(msg);
 	}
 	
+	private void sendAnswer(String ans) {
+		Message msg = new Message();
+		msg.obj = ans;
+		msg.arg1 = 0;
+		handler.sendMessage(msg);
+	}
+	
 	private void writeSegmentedImages() {
+		
+		// Standard size of 128x128
+		Size stdSize = new Size(128, 128);
+		
 		if (charMatList.size() == 0) return;
 		File sdcard = Environment.getExternalStorageDirectory();
 		File dir = new File(sdcard.getAbsolutePath() + "/transOptic/segImgs");
-		if (!dir.exists()) dir.mkdirs();	
+		if (!dir.exists()) dir.mkdirs();
+		
+		// Clearing the folder
+		for (int i = 0; i < 15; i++) {
+			File file = new File(dir, "char" + i + ".jpg");
+			if (file.exists()) file.delete();
+		}
 			
+		// Write out as converted grayscale and sized images
 		int imageCnt = 1;
 		for (Mat roi : charMatList) {
-			if (imageCnt == 4) break;
+			
+			// Resize Roi to standard size, convert to grayscale
+			Imgproc.resize(roi, roi, stdSize);
+			Imgproc.cvtColor(roi, roi, Imgproc.COLOR_BGR2GRAY, 1);
+			Imgproc.cvtColor(roi, roi, Imgproc.COLOR_GRAY2RGBA, 4); // convert it back just for.....printing
+			
 			File file = new File(dir, "char" + imageCnt + ".jpg");
-			if (file.exists()) file.delete();
 			Bitmap bitmap = Bitmap.createBitmap(roi.cols(), roi.rows(), Bitmap.Config.ARGB_8888);
 			Utils.matToBitmap(roi, bitmap);
 			try {
@@ -471,11 +526,172 @@ public class Processing implements Runnable{
 		}
 	}
 
+	private String templateMatch() {
+		System.out.println("Initiated template matching");
+		
+		char[] labels = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
+		String res = "";
+		int numFilters = 36;
+		Mat[] templates = new Mat[numFilters];
+		Size stdSize = new Size(128, 128);
+		double[][] results = new double[charMatList.size()][numFilters];
+		
+		// Creating all templates
+		for (int i = 0; i < numFilters; i++) {
+			System.out.println("Creating template " + (int)(i+1));
+			String path = "transOptic/templates/" + (int)(i+1) + ".jpg";
+			File imageFile = new File(Environment.getExternalStorageDirectory(), path);
+			if (!imageFile.exists()) return null;
+			
+			BitmapFactory.Options options = new BitmapFactory.Options();
+			options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+			Bitmap bitmap = BitmapFactory.decodeFile(imageFile.getAbsolutePath(), options);
+			templates[i] = Utils.bitmapToMat(bitmap);
+			bitmap.recycle();
+			System.gc();
+		}
+		System.out.println("Created Templates");
+		
+		// Matching
+		for (int i = 0; i < charMatList.size(); i++) {
+			// Resize segmented image to standard size, convert to grayscale
+			Mat ch = charMatList.get(i);
+			Imgproc.resize(ch, ch, stdSize);
+			Imgproc.cvtColor(ch, ch, Imgproc.COLOR_BGR2GRAY, 1);
+			Imgproc.cvtColor(ch, ch, Imgproc.COLOR_GRAY2RGBA, 4);
+			
+			double maxCorr = 0;
+			int maxIndex = 0;
+			for (int j = 0; j < numFilters; j++) {
+				Mat result = new Mat();
+				
+				// Simple template matching for now
+				// 3, 4, 5 are pretty good
+				Imgproc.matchTemplate(ch, templates[j], result, 5);
+				double corr = result.get(0,0)[0];
+				if (corr > maxCorr) {
+					maxIndex = j;
+					maxCorr = corr;
+				}
+				//System.out.println("Size of result: " + result.size());
+				//System.out.println("\tResult for image " + i + ", filter " + j + " is " + Arrays.toString(result.get(0, 0)));
+			}
+			
+			res = res + labels[maxIndex];
+		}
+		return res;
+	}
+	
+	private String corrMatch() {
+		System.out.println("Initiated correlation matching");
+		
+		char[] labels = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
+		String res = "";
+		int numFilters = 36;
+		Mat[] filters = new Mat[numFilters];
+		Size stdSize = new Size(32, 32);
+		double[][] results = new double[charMatList.size()][numFilters];
+		
+		// Creating all templates
+		for (int i = 10; i < numFilters; i++) {
+			System.out.println("Creating filter bank " + (int)(i+1));
+			String path = "transOptic/corrFilter/" + (int)(i+1) + ".jpg";
+			File imageFile = new File(Environment.getExternalStorageDirectory(), path);
+			if (!imageFile.exists()) return null;
+			
+			BitmapFactory.Options options = new BitmapFactory.Options();
+			options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+			Bitmap bitmap = BitmapFactory.decodeFile(imageFile.getAbsolutePath(), options);
+			Mat temp = Utils.bitmapToMat(bitmap);
+			Imgproc.cvtColor(temp, temp, Imgproc.COLOR_BGR2GRAY, 1);
+			
+			System.out.println("CV TYPE " + temp.type());
+			System.out.println("CV Depth " + temp.depth());
+			System.out.println("CV Channels " + temp.channels());
+			temp.convertTo(temp, CvType.CV_32FC1, 255);
+			
+			filters[i] = temp;
+			Imgproc.resize(filters[i], filters[i], stdSize);
+			bitmap.recycle();
+			System.gc();
+		}
+		System.out.println("Created Filters");
+		
+		// Matching
+		for (int i = 0; i < charMatList.size(); i++) {
+			// Resize segmented image to standard size, convert to grayscale
+			Mat ch = charMatList.get(i).clone();
+			Imgproc.resize(ch, ch, stdSize);
+			Imgproc.cvtColor(ch, ch, Imgproc.COLOR_BGR2GRAY, 1);
+			//Imgproc.cvtColor(ch, ch, Imgproc.COLOR_GRAY2RGBA, 4);
+			
+			/*
+			System.out.println("CV TYPE " + ch.type());
+			System.out.println("CV Depth " + ch.depth());
+			System.out.println("CV Channels " + ch.channels());
+			*/
+			
+			ch.convertTo(ch, CvType.CV_32FC1, 255);
+			
+			System.out.println("CV TYPE " + ch.type());
+			System.out.println("CV Depth " + ch.depth());
+			System.out.println("CV Channels " + ch.channels());
+			
+			double maxPSR = 0;
+			int maxIndex = 0;
+			for (int j = 10; j < numFilters; j++) {
+				// Calculating the correlation
+				Mat temp = new Mat();
+				Mat chFFT = new Mat();
+				Core.dft(ch, chFFT);
+				Core.mulSpectrums(chFFT, filters[j], temp, Core.DFT_ROWS);
+				Core.dft(temp, temp, Core.DFT_INVERSE);
+				Core.normalize(temp, temp);
+				
+				double corrMax = Core.minMaxLoc(temp).maxVal;
+				Mat mean = new Mat();
+				Mat stddev = new Mat();
+				Core.meanStdDev(temp, mean, stddev);
+				System.out.println("Size of Mean: " + mean.size());
+				System.out.println("Print of Mean: " + printMat(mean));
+				System.out.println("Size of Stddev: " + stddev.size());
+				System.out.println("Print of Stddev: " + printMat(stddev));
+				//double PSR = (corrMax - corrMean[0])/
+				/*
+				// Calculating PSR
+				MinMaxLocResult mmLoc = Core.minMaxLoc(temp);
+				Point maxLoc = mmLoc.maxLoc;
+				double corrMax = mmLoc.maxVal;
+				
+				// Brute Forcing
+				Core.flip(temp, temp, -1);
+				
+				// Setting the internal window to zero
+				Mat window = temp.submat((int)maxLoc.y-2, (int)maxLoc.y+2, (int)maxLoc.x-2, (int)maxLoc.x+2);
+				*/
+				double corrMean = mean.get(0,0)[0];
+				double corrStddev = stddev.get(0,0)[0];
+				double psr = Math.abs((corrMax - corrMean) / corrStddev);
+				if (psr > maxPSR) {
+					maxIndex = j;
+					maxPSR = psr;
+				}
+			}
+			res = res + labels[maxIndex];
+		}
+		return res;
+	}
+	
 	@Override
 	public void run() {
+		
+		/* Store the image onto the sdcard */
 		storeImg();
 		
+		/* Get the bitmap from the sdcard */
 		Bitmap bitmap = getImgBitmap();
+		
+		/* Send the bitmap over for an initial display after taking picture */
 		updateDisplay(bitmap);
 		
 		bitmap = process(bitmap);

@@ -31,6 +31,7 @@ public class Overlay extends View {
     		image = Bitmap.createScaledBitmap(image, getWidth(), getHeight(), false);
     	if (this.image != null) this.image.recycle();
     	this.image = image;
+    	System.gc();
     }
     
     public Bitmap getBitmap() {

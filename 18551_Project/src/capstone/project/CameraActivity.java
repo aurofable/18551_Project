@@ -14,11 +14,16 @@ import android.hardware.Camera.ShutterCallback;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class CameraActivity extends Activity {
@@ -28,9 +33,11 @@ public class CameraActivity extends Activity {
 	private Preview 		mPreview;
 	private Overlay 		mOverlay;
 	private Button 			buttonProc, buttonBinImage, buttonReset;
+	private TextView 		textAns;
 		
 	// Random
 	private boolean binaryImage;
+	private int 	mode;
 	
 	
     /** Called when the activity is first created. */
@@ -39,8 +46,8 @@ public class CameraActivity extends Activity {
         super.onCreate(savedInstanceState);
         
         // Hide the window title.
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-		getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        //requestWindowFeature(Window.FEATURE_NO_TITLE);
+		//getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		getWindow().setFormat(PixelFormat.UNKNOWN);
 		setContentView(R.layout.main);
 		
@@ -68,6 +75,40 @@ public class CameraActivity extends Activity {
 		buttonProc.setOnClickListener(snapAndProcess());
 		buttonBinImage.setOnClickListener(switchBinaryImage());
 		buttonReset.setOnClickListener(reset());
+		
+		// Setting textview
+		textAns = (TextView) findViewById(R.id.answer);
+    }
+    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+    	MenuInflater inflater = getMenuInflater();
+    	inflater.inflate(R.menu.menu, menu);
+    	return true;
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+    	Toast t = null;
+    	switch (item.getItemId()) {
+        case R.id.SimpleCorr:     
+        	t = Toast.makeText(this, "Using a simple correlation", Toast.LENGTH_SHORT);
+        	mode = 0;
+            break;
+        case R.id.CorrFilter:     
+        	t = Toast.makeText(this, "Using correlation filter", Toast.LENGTH_SHORT);
+        	mode = 2;
+            break;
+        case R.id.SVM: 
+        	t = Toast.makeText(this, "Using an SVM", Toast.LENGTH_SHORT); // NEED TO MAKE THIS
+        	mode = 3;
+            break;
+        default: return true;
+        
+    	}
+    	t.setGravity(Gravity.TOP, 0, 0);
+		t.show();
+    	return true;
     }
     
     public static Camera getCameraInstance() {
@@ -93,7 +134,9 @@ public class CameraActivity extends Activity {
     	return new ShutterCallback() {
 			@Override
 			public void onShutter() {
-				Toast.makeText(CameraActivity.this, "SNAP!...Analyzing", Toast.LENGTH_SHORT).show();
+				Toast t = Toast.makeText(CameraActivity.this, "SNAP!...Analyzing", Toast.LENGTH_LONG);
+				t.setGravity(Gravity.TOP, 0, 0);
+				t.show();
 			}
     	};
     }
@@ -103,7 +146,7 @@ public class CameraActivity extends Activity {
 			@Override
 			public void onPictureTaken(byte[] data, Camera c) {
 				if (data == null) return;
-				Processing p = new Processing(mHandler, binaryImage, mPreview.getWidth(), mPreview.getHeight(), data);
+				Processing p = new Processing(mHandler, mode, binaryImage, mPreview.getWidth(), mPreview.getHeight(), data);
 				new Thread(p).start();
 			}
     	};
@@ -152,10 +195,19 @@ public class CameraActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				buttonProc.setEnabled(false);
-				if (!binaryImage) buttonBinImage.setText("Normal Image");
-				else buttonBinImage.setText("Binary Image");
+				Toast t;
+				if (!binaryImage) {
+					buttonBinImage.setText("Normal Image");
+					t = Toast.makeText(CameraActivity.this, "Displaying Binary Image now", Toast.LENGTH_SHORT);
+				}
+				else {
+					buttonBinImage.setText("Binary Image");
+					t = Toast.makeText(CameraActivity.this, "Displaying Normal Image now", Toast.LENGTH_SHORT);
+				}
 				binaryImage = !binaryImage;
 				buttonProc.setEnabled(true);
+				t.setGravity(Gravity.TOP, 0, 0);
+				t.show();
 			}
 		};
 	}
@@ -165,7 +217,10 @@ public class CameraActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				showBitmap(null);
-				Toast.makeText(CameraActivity.this, "RESET!", Toast.LENGTH_SHORT).show();
+				textAns.setText("");
+				Toast t = Toast.makeText(CameraActivity.this, "RESET!", Toast.LENGTH_SHORT);
+				t.setGravity(Gravity.TOP, 0, 0);
+				t.show();
 			}
 		};
 	}
@@ -176,8 +231,18 @@ public class CameraActivity extends Activity {
 	
 	Handler mHandler = new Handler() {
 		public void handleMessage(Message msg) {
-			Bitmap b = (Bitmap) msg.obj;
-			showBitmap(b);
+			
+			switch (msg.arg1) {
+				case 0:
+					String ans = (String) msg.obj;
+					textAns.setText(ans);
+					break;
+				case 1:
+					Bitmap b = (Bitmap) msg.obj;
+					showBitmap(b);
+					break;
+				default:
+			}
 		}
 	};
 }
