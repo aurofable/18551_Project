@@ -2,7 +2,7 @@
 % Dimensionality Reduction using PCA
 % James Chun, jtchun@andrew.cmu.edu
 
-function [dataSet nVecs cummulVar] = dimRed(data, dataGray, n, dim, numSamplesPerChar, numClasses, reducFact, rowDiv, colDiv, nHarmonics)
+function [dataSet nVecs cummulVar] = dimRed(data, dataGray, labelVec, n, dim, numSamplesPerChar, numClasses, reducFact, rowDiv, colDiv, nHarmonics)
 
 filterSize = 128 * reducFact;
 filterBank = getFilterBank(reducFact);
@@ -11,8 +11,8 @@ filterBank = getFilterBank(reducFact);
 dataInput = zeros(numSamplesPerChar * numClasses, dim);
 dataIndex = 0;
 for i = 1:numClasses
-    char = data{i};
-    charG = dataGray{i};
+    char = data{labelVec(i)};
+    charG = dataGray{labelVec(i)};
     for j = 1:numSamplesPerChar
         dataIndex = dataIndex + 1;
 
@@ -53,7 +53,7 @@ for i = 1:numClasses
 end
 
 % PCA
-[COEFF, ~, LATENT] = princomp(dataInput);
+[COEFF, SCORE, LATENT] = princomp(dataInput);
 cummulVar = cumsum(diag(LATENT))/sum(diag(LATENT));
 
 % Getting the first n eigenvectors

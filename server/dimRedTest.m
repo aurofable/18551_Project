@@ -4,7 +4,7 @@
 % Used for testing
 % 
 
-function [dataSet] = dimRedTest(data, dataGray, dim, numSamplesPerChar, numClasses, reducFact, nVecs, rowDiv, colDiv, nHarmonics)
+function [dataSet] = dimRedTest(data, dataGray, labelVec, dim, numSamplesPerChar, numClasses, reducFact, nVecs, rowDiv, colDiv, nHarmonics)
 
 filterSize = 128 * reducFact;
 filterBank = getFilterBank(reducFact);
@@ -13,8 +13,8 @@ filterBank = getFilterBank(reducFact);
 dataInput = zeros(numSamplesPerChar * numClasses, dim);
 dataIndex = 0;
 for i = 1:numClasses    
-    char = data{i};
-    charG = dataGray{i};
+    char = data{labelVec(i)};
+    charG = dataGray{labelVec(i)};
     for j = 1:numSamplesPerChar
         dataIndex = dataIndex + 1;
         

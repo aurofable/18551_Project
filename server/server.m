@@ -7,10 +7,21 @@
 % computation on it and transmits it back to the client
 
 clear all;
-%load svmTrain.mat
-%load svmTrainLibSVM.mat
-%load svmT'rainLibSVM (2)'
-%load svmTrainLibSVM256.mat
+
+% Options
+usingTemplate = 1;
+usingSVM_Nums = 0;
+usingSVM_NumsChar = 0;
+
+% Loading necessary Data
+if (usingTemplate == 1)
+    load CF_test1Data.mat
+elseif (usingSVM_Nums == 1)
+    load SVMTrainNums.mat
+elseif (usingSVM_NumsChar == 1)
+    load SVMTrainNumsChar.mat
+else return
+end
 
 receivedFileName = 'received.jpg';
 sentFileName = 'sent.jpg';
@@ -45,7 +56,11 @@ while (running == 1)
         
         % Processing...
         [charsBW charsGray ave stdev] = segment(img);
-        answer = capstoneClassify(charsBW, charsGray, labels, reducFact, nVecs, model, rowDiv, colDiv, ranges, minimums);
+        if (usingTemplate == 1)
+            answer = CF_classify(charsBW, H);
+        else
+            answer = capstoneClassify(charsBW, charsGray, labels, reducFact, nVecs, model, rowDiv, colDiv, ranges, minimums);
+        end
                
         % Post-Processing
         procImg = drawBoundingBoxes(img, ave, stdev);

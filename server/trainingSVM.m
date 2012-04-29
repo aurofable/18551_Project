@@ -6,11 +6,12 @@ clear all;
 load segData;
 
 labels = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'; % Actual label vector
+labelVec = 11:36; % Actual label vector
 numTrainingSamplesPerChar = 700;
 
 % Implementing Zoning
-n = 256; % Num Features
-m = length(labels);  % Num Classes;
+n = 52; % Num Features
+m = length(labelVec);  % Num Classes;
 imageSize = [128 128];
 
 % Feature vector variables
@@ -24,11 +25,11 @@ dim = nHarmonics*4 + colDiv*rowDiv + imageSize(1)*imageSize(2)*reducFact*reducFa
 % Generating labels
 trainingLabels = ones(numTrainingSamplesPerChar * m, 1);
 for i = 1:m
-    trainingLabels((i-1)*numTrainingSamplesPerChar+1:i*numTrainingSamplesPerChar) = i*ones(numTrainingSamplesPerChar, 1);
+    trainingLabels((i-1)*numTrainingSamplesPerChar+1:i*numTrainingSamplesPerChar) = labelVec(i)*ones(numTrainingSamplesPerChar, 1);
 end
 
 % Generating Data and Reducing Dimensions
-[trainingData nVecs cummulVar] = dimRed(imgDataTrainSeg, imgDataTrainSegGray, n, dim, numTrainingSamplesPerChar, m, reducFact, rowDiv, colDiv, nHarmonics);
+[trainingData nVecs cummulVar] = dimRed(imgDataTrainSeg, imgDataTrainSegGray, labelVec, n, dim, numTrainingSamplesPerChar, m, reducFact, rowDiv, colDiv, nHarmonics);
 
 % Normalizing Features
 minimums = min(trainingData, [], 1);
@@ -52,5 +53,5 @@ end
 % Training SVM
 cmd = ['-t 0 -c ', num2str(bestc), ' -g ', num2str(bestg)];
 model = svmtrain(trainingLabels, trainingData, cmd);
-clearvars -except model labels dim m n rowDiv colDiv trainingLabels trainingData nVecs reducFact cummulVar nHarmonics minimums ranges;
+clearvars -except model labels labelVec dim m n rowDiv colDiv trainingLabels trainingData nVecs reducFact cummulVar nHarmonics minimums ranges;
 save svmTrainLibSVM.mat;

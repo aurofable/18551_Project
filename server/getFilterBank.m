@@ -13,9 +13,9 @@ filterSize = 128*reducFact;
 sigma = 0.5; % sigma for gaussian
 
 % For Gabor
-theta1 = degtorad(0);
-theta2 = degtorad(60);
-theta3 = degtorad(120);
+theta1 = deg2rad(0);
+theta2 = deg2rad(60);
+theta3 = deg2rad(120);
 gamma = 2;
 lambda = 0.6;
 psi = 0;
