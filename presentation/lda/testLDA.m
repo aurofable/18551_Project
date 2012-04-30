@@ -10,7 +10,7 @@ load segData.mat
 % Variables
 data = imgDataTrainSeg;
 dataGray = imgDataTrainSegGray;
-numSamplesPerChar = 200;
+numSamplesPerChar = 10;
 labelVec = 1:10;        % Numbers only
 n = 17;                 % Num Features
 m = length(labelVec);   % Num Classes
