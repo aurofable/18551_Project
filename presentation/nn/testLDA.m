@@ -37,42 +37,42 @@ ranges = max(dataSet, [], 1) - minimums;
 dataSet = (dataSet - repmat(minimums, size(dataSet, 1), 1)) ./ repmat(ranges, size(dataSet, 1), 1);
 
 % Plotting dataset
-% figure
-% gscatter(dataSet(:,1), dataSet(:,2), trainingLabels, []);
-% title('Plot of Normalized, First 2 features in a 10 class Training Dataset');
-% xlabel('1st Feature');
-% ylabel('2nd Feature');
+figure
+gscatter(dataSet(:,1), dataSet(:,2), trainingLabels, []);
+title('Plot of Normalized, First 2 features in a 10 class Training Dataset');
+xlabel('1st Feature');
+ylabel('2nd Feature');
 
 % Generating our testDataSet
 testDataSet = dimRedTest(imgDataTestSeg, imgDataTestSegGray, labelVec, dim, numSamplesPerChar, m, reducFact, nVecs, rowDiv, colDiv, nHarmonics);
 
 save temp.mat
 
-% % Testing Capstone LDA
-% ldaClass = classify(testDataSet, dataSet, trainingLabels);
-% bad = ~strcmp(ldaClass,trainingLabels);
-% ldaResubErr = sum(bad) / (n*numSamplesPerChar); % 0.0050
-% 
-% [ldaResubCM,grpOrder] = confusionmat(trainingLabels,ldaClass);
-% 
-% % Error Plot
-% figure
-% gscatter(dataSet(:,1), dataSet(:,2), trainingLabels, []);
-% hold on;
-% plot(dataSet(bad,1), dataSet(bad,2), 'o');
-% hold off;
-% 
-% % Plotting function lines
-% [x,y] = meshgrid(0:.01:1,0:.01:1);
-% x = x(:);
-% y = y(:);
-% j = classify([x y],dataSet(:,1:2),trainingLabels);
-% gscatter(x,y,j,[]);
-% title('Plot of Region Classification by LDA for 10 Classes')
-% xlabel('1st Feature');
-% ylabel('2nd Feature');
-% 
-% % Attempting Quadratic disciminant analysis
-% qdaClass = classify(testDataSet, dataSet,trainingLabels,'quadratic');
-% bad = ~strcmp(qdaClass,trainingLabels);
-% qdaResubErr = sum(bad) / (n*numSamplesPerChar); % 0.0050
+% Testing Capstone LDA
+ldaClass = classify(testDataSet, dataSet, trainingLabels);
+bad = ~strcmp(ldaClass,trainingLabels);
+ldaResubErr = sum(bad) / (n*numSamplesPerChar); % 0.0050
+
+[ldaResubCM,grpOrder] = confusionmat(trainingLabels,ldaClass);
+
+% Error Plot
+figure
+gscatter(dataSet(:,1), dataSet(:,2), trainingLabels, []);
+hold on;
+plot(dataSet(bad,1), dataSet(bad,2), 'o');
+hold off;
+
+% Plotting function lines
+[x,y] = meshgrid(0:.01:1,0:.01:1);
+x = x(:);
+y = y(:);
+j = classify([x y],dataSet(:,1:2),trainingLabels);
+gscatter(x,y,j,[]);
+title('Plot of Region Classification by LDA for 10 Classes')
+xlabel('1st Feature');
+ylabel('2nd Feature');
+
+% Attempting Quadratic disciminant analysis
+qdaClass = classify(testDataSet, dataSet,trainingLabels,'quadratic');
+bad = ~strcmp(qdaClass,trainingLabels);
+qdaResubErr = sum(bad) / (n*numSamplesPerChar); % 0.0050
