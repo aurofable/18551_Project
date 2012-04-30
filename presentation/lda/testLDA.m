@@ -10,7 +10,7 @@ load segData.mat
 % Variables
 data = imgDataTrainSeg;
 dataGray = imgDataTrainSegGray;
-numSamplesPerChar = 200;
+numSamplesPerChar = 50;
 labelVec = 1:10;        % Numbers only
 n = 17;                 % Num Features
 m = length(labelVec);   % Num Classes
@@ -37,11 +37,11 @@ ranges = max(dataSet, [], 1) - minimums;
 dataSet = (dataSet - repmat(minimums, size(dataSet, 1), 1)) ./ repmat(ranges, size(dataSet, 1), 1);
 
 % Plotting dataset
-% figure
-% gscatter(dataSet(:,1), dataSet(:,2), trainingLabels, []);
-% title('Plot of Normalized, First 2 features in a 10 class Training Dataset');
-% xlabel('1st Feature');
-% ylabel('2nd Feature');
+figure
+gscatter(dataSet(:,1), dataSet(:,2), trainingLabels, []);
+title('Plot of Normalized, First 2 features in a 10 class Training Dataset');
+xlabel('1st Feature');
+ylabel('2nd Feature');
 
 % Generating our testDataSet
 testDataSet = dimRedTest(imgDataTestSeg, imgDataTestSegGray, labelVec, dim, numSamplesPerChar, m, reducFact, nVecs, rowDiv, colDiv, nHarmonics);
