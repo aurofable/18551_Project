@@ -46,7 +46,7 @@ stdev = std(areas);
 ave = mean(areas);
 for i = 1:length(charsBW)
     d = abs(cornerPointsY(i) - p1(1)*cornerPointsX(i) - p2(2)) / sqrt(p1(1) * p1(1) + 1);
-    if ((abs(areas(i) - ave) > 1.5*stdev) || d > ave)
+    if ((abs(areas(i) - ave) > 4*stdev) || d > ave)
         charsBW{i} = [];
         charsGray{i} = [];
     else
