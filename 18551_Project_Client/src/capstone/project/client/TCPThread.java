@@ -17,7 +17,7 @@ public class TCPThread implements Runnable {
 	private static final String TAG = "Capstone::TCPThread";
 
 	/* Variables */
-	private String ipAdd = "128.237.117.23";
+	private String ipAdd = "128.237.123.216";
 	private int port = 8888;
 
 	/* Data and Processing */

@@ -29,7 +29,7 @@ public class ClientActivity extends Activity {
 	private TextView		ansView;
 	
 	private int port = 8888;
-	private String ipAdd = "128.237.117.23";
+	private String ipAdd = "128.237.123.216";
 	
 	int CAMERA_PIC_REQUEST = 1234;
 	String path = Environment.getExternalStorageDirectory() + "/send.jpg";

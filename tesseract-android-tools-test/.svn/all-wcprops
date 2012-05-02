@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/svn/!svn/ver/6/trunk/tesseract-android-tools-test
+END
+default.properties
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/!svn/ver/4/trunk/tesseract-android-tools-test/default.properties
+END
+.classpath
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/!svn/ver/4/trunk/tesseract-android-tools-test/.classpath
+END
+proguard.cfg
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/!svn/ver/4/trunk/tesseract-android-tools-test/proguard.cfg
+END
+.project
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/!svn/ver/4/trunk/tesseract-android-tools-test/.project
+END
+AndroidManifest.xml
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/!svn/ver/5/trunk/tesseract-android-tools-test/AndroidManifest.xml
+END

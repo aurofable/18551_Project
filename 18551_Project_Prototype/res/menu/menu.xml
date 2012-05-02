@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+	<item android:id="@+id/SimpleCorr"
+        android:title="Simple Correlation" />
+    <item android:id="@+id/CorrFilter"
+        android:title="Correlation Filter" />
+    <item android:id="@+id/SVM"
+        android:title="SVM" />
+</menu>

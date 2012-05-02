@@ -1,0 +1,89 @@
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/!svn/ver/6/trunk/tesseract-android-tools/src/com/googlecode/leptonica/android
+END
+Pix.java
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/!svn/ver/4/trunk/tesseract-android-tools/src/com/googlecode/leptonica/android/Pix.java
+END
+Convert.java
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/!svn/ver/3/trunk/tesseract-android-tools/src/com/googlecode/leptonica/android/Convert.java
+END
+Pixa.java
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/!svn/ver/3/trunk/tesseract-android-tools/src/com/googlecode/leptonica/android/Pixa.java
+END
+Enhance.java
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/!svn/ver/3/trunk/tesseract-android-tools/src/com/googlecode/leptonica/android/Enhance.java
+END
+Binarize.java
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/!svn/ver/3/trunk/tesseract-android-tools/src/com/googlecode/leptonica/android/Binarize.java
+END
+Scale.java
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/!svn/ver/3/trunk/tesseract-android-tools/src/com/googlecode/leptonica/android/Scale.java
+END
+Box.java
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/!svn/ver/4/trunk/tesseract-android-tools/src/com/googlecode/leptonica/android/Box.java
+END
+Skew.java
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/!svn/ver/3/trunk/tesseract-android-tools/src/com/googlecode/leptonica/android/Skew.java
+END
+WriteFile.java
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/!svn/ver/6/trunk/tesseract-android-tools/src/com/googlecode/leptonica/android/WriteFile.java
+END
+ReadFile.java
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/!svn/ver/6/trunk/tesseract-android-tools/src/com/googlecode/leptonica/android/ReadFile.java
+END
+AdaptiveMap.java
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/!svn/ver/3/trunk/tesseract-android-tools/src/com/googlecode/leptonica/android/AdaptiveMap.java
+END
+Constants.java
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/!svn/ver/3/trunk/tesseract-android-tools/src/com/googlecode/leptonica/android/Constants.java
+END
+JpegIO.java
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/!svn/ver/6/trunk/tesseract-android-tools/src/com/googlecode/leptonica/android/JpegIO.java
+END
+Rotate.java
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/!svn/ver/3/trunk/tesseract-android-tools/src/com/googlecode/leptonica/android/Rotate.java
+END

@@ -1,0 +1,83 @@
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/!svn/ver/6/trunk/tesseract-android-tools-test/src/com/googlecode/leptonica/android/test
+END
+ConvertTest.java
+K 25
+svn:wc:ra_dav:version-url
+V 109
+/svn/!svn/ver/5/trunk/tesseract-android-tools-test/src/com/googlecode/leptonica/android/test/ConvertTest.java
+END
+PixTest.java
+K 25
+svn:wc:ra_dav:version-url
+V 105
+/svn/!svn/ver/5/trunk/tesseract-android-tools-test/src/com/googlecode/leptonica/android/test/PixTest.java
+END
+PixaTest.java
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svn/!svn/ver/4/trunk/tesseract-android-tools-test/src/com/googlecode/leptonica/android/test/PixaTest.java
+END
+EnhanceTest.java
+K 25
+svn:wc:ra_dav:version-url
+V 109
+/svn/!svn/ver/4/trunk/tesseract-android-tools-test/src/com/googlecode/leptonica/android/test/EnhanceTest.java
+END
+BinarizeTest.java
+K 25
+svn:wc:ra_dav:version-url
+V 110
+/svn/!svn/ver/4/trunk/tesseract-android-tools-test/src/com/googlecode/leptonica/android/test/BinarizeTest.java
+END
+ScaleTest.java
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/svn/!svn/ver/4/trunk/tesseract-android-tools-test/src/com/googlecode/leptonica/android/test/ScaleTest.java
+END
+BoxTest.java
+K 25
+svn:wc:ra_dav:version-url
+V 105
+/svn/!svn/ver/4/trunk/tesseract-android-tools-test/src/com/googlecode/leptonica/android/test/BoxTest.java
+END
+SkewTest.java
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svn/!svn/ver/4/trunk/tesseract-android-tools-test/src/com/googlecode/leptonica/android/test/SkewTest.java
+END
+WriteFileTest.java
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/svn/!svn/ver/4/trunk/tesseract-android-tools-test/src/com/googlecode/leptonica/android/test/WriteFileTest.java
+END
+ReadFileTest.java
+K 25
+svn:wc:ra_dav:version-url
+V 110
+/svn/!svn/ver/6/trunk/tesseract-android-tools-test/src/com/googlecode/leptonica/android/test/ReadFileTest.java
+END
+AdaptiveMapTest.java
+K 25
+svn:wc:ra_dav:version-url
+V 113
+/svn/!svn/ver/4/trunk/tesseract-android-tools-test/src/com/googlecode/leptonica/android/test/AdaptiveMapTest.java
+END
+JpegIOTest.java
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svn/!svn/ver/4/trunk/tesseract-android-tools-test/src/com/googlecode/leptonica/android/test/JpegIOTest.java
+END
+RotateTest.java
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svn/!svn/ver/4/trunk/tesseract-android-tools-test/src/com/googlecode/leptonica/android/test/RotateTest.java
+END
