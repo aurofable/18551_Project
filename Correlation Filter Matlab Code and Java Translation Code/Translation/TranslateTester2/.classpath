@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="gen"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/Alex/workspace/TranslateTester2/lib/google-api-translate-v2-rev2-java-1.4.0-beta.jar"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/Alex/workspace/TranslateTester2/lib/google-api-translate-v2-rev2-java-1.4.0-beta-javadoc.jar"/>
+	<classpathentry exported="true" kind="lib" path="C:/Users/Alex/workspace/TranslateTester2/lib/google-api-translate-v2-rev2-java-1.4.0-beta-sources.jar"/>
+	<classpathentry kind="output" path="bin/classes"/>
+</classpath>

@@ -9,15 +9,18 @@
 clear all;
 
 % Options
-usingTemplate = 1;
+usingTemplate = 0;
 usingSVM_Nums = 0;
-usingSVM_NumsChar = 0;
+usingSVM_Char = 1;
+usingSVM_NumsChar = 0; % Broken
 
 % Loading necessary Data
 if (usingTemplate == 1)
     load CF_test1Data.mat
 elseif (usingSVM_Nums == 1)
     load SVMTrainNums.mat
+elseif (usingSVM_Char == 1)
+    load SVMTrainChar.mat
 elseif (usingSVM_NumsChar == 1)
     load SVMTrainNumsChar.mat
 else return
@@ -59,7 +62,7 @@ while (running == 1)
         if (usingTemplate == 1)
             answer = CF_classify(charsBW, H);
         else
-            answer = capstoneClassify(charsBW, charsGray, labels, reducFact, nVecs, model, rowDiv, colDiv, ranges, minimums);
+            answer = capstoneClassify(charsBW, charsGray, dim, labels, reducFact, nVecs, model, rowDiv, colDiv, nHarmonics, ranges, minimums);
         end
                
         % Post-Processing

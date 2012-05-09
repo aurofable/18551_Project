@@ -1,0 +1,128 @@
+\section{Introduction}
+
+\subsection{Abstract}
+{\em
+This report, together with our project's code can be found on the CD. Instructions
+are included inside on the setting up of the environment and running the code.
+The source code is also available online, for browsing at https://github.com/aurofable/18551\_Project
+}\\
+
+As our capstone project for 18-551, we implemented an Optical Character Recognition (OCR) system on the
+android platform. At the end of 6 weeks, our final demo was able to accurately
+decode digits 0-9 with an approximate accuracy of 96\%, as shown by our cross-validation
+results. This was translation invariant, and slightly robust to noise.\\
+This report will give an introduction to our project, followed by an elaboration of our 
+algorithm design and our training and testing results. We will conclude a rundown of final demo
+implementation, as well as some challenges and possible future work.\\
+
+\subsection{Problem}
+With the increasing power and rise in use of smartphones and tablets, 
+the informational world has opened up tremendously. However, some of the less-widely known, 
+yet critical, processes required for a large variety of applications focuses on visual 
+input to generate and manipulate data. One such process is optical character recognition, 
+a method used to convert captured image data to ASCII text. As there are several different 
+types of OCR techniques, a large part of our project focused on writing, testing, and 
+comparing the various methods to better understand which types work well in different 
+situations.\\
+Another significant portion of our project revolved around using the Android-powered 
+Motorola XOOM tablets to implement these OCR methods. We used the tablet cameras to obtain 
+input images, pre-processed them before feeding them to the OCR code, and displayed the 
+results on the screen for debugging and user convenience. While certain processes of our 
+project worked better than others, there is still plenty of room to continue development, 
+potentially even using our results for a more complex Android application.
+
+
+\subsubsection{Background}
+The problem we have chosen to address is that of text recognition 
+using computer vision; more specifically, mobile embedded vision. 
+As mobile devices gain increasingly powerful processors and access 
+to quicker networks, data input becomes the bottleneck. A typical 
+user on a smartphone virtual keyboard has an input rate of 15 bits/s \cite{jeffBier}. 
+The camera, a feature found in nearly every mobile device today, 
+is the highest-bandwidth input device. Here, image extraction and 
+recognition become increasingly crucial procedures as mobile 
+applications develop. The application we selected to work on dealt 
+with image processing, focusing mainly on OCR.
+
+\subsubsection{Specifics}
+Today's world is filled with information that consumers generally 
+take for granted, whether traffic signs, menu items, or instructions 
+pertaining to shopping sales, appliances, and many other details. 
+While people assimilate large amounts of textual data very quickly, 
+easily translating visual input to communicated information, technology 
+has difficulty relating images and text. This poses a problem for a 
+variety of potential applications ranging from scanners, data organizers, 
+translators, and other such helpful tools. In the end, however, a simple, 
+unnoticed consumer means of data conversion becomes a far more critical and 
+lengthy process.\\
+
+
+
+\subsection{Proposed Solution}
+
+\subsubsection{Background}
+There are currently a wide variety of 
+optical character recognition methods, 
+and many of them are used in more 
+complex mobile applications.
+
+\subsubsection{Novelty}
+While text recognition is not a revolutionary process, 
+our project sought to compare several different optical 
+character recognition methods in relation to the Motorola XOOM 
+mobile tablet, powered by Android. We emulated and tested a 
+variety of pattern recognition processes in Matlab and on the 
+tablet itself, amplifying the success rate of our methods with 
+pre-processing segmentation algorithms and displaying the results 
+for verification on the tablet's screen.\\
+
+
+\subsection{Previous 18-551 Work}
+So far, no previous 18-551 group has compared 
+the variety of OCR methods we have, and none 
+of them have worked with the Motorola XOOM 
+tablets before. There were, however, sections of a 
+few past projects that streamlined our outlook on 
+several processes.
+
+\subsubsection{Spring 2011 Group 6}
+The Automatic LP Digitalization group 
+worked with OCR to convert album labels 
+in their project. While our project focused 
+far more heavily on different OCR methods, 
+we were able to use some of their experimental 
+findings to anticipate potential problems that 
+could have occurred during the debugging phase. 
+For example, they noticed that the characters "EX" 
+were being read as a single letter due to the characters'
+proximity. We were able to avoid this issue, for the 
+most part, by choosing to convert regulated inputs, 
+though a more robust solution would involve focusing 
+on a segmentation algorithm that windows sections of 
+input data more carefully.
+
+\subsubsection{Fall 2007 Group 3}
+The Cursive Handwriting Segmentation and Character 
+Recognition group had several steps we considered 
+when developing the majority of our project. 
+Because they focused on cursive handwriting for input, 
+their segmentation methods differed from ours, as they needed 
+to break each letter without using the typical whitespace between characters.\\
+Another detail from their project we looked at was the OCR they implemented: 
+SVMs, one of the methods we used as well.\\
+This group also used thresholding to convert input images to 
+grayscale, and normalization to eliminate slanting and skew from 
+different inputs. We used several of these steps in our own project, 
+as will be discussed in later sections. They also implemented a few 
+processes to improve efficiency, including zero padding and thinning, 
+methods that, while potentially convenient for our project, serve a much 
+better purpose for distinguishing cursive handwriting.
+
+\subsubsection{Other Handwriting Projects}
+Group 9 of Spring 2005 converted handwriting to ASCII characters, and they focused more on the handwriting part of the process, allowing strokes to be part of the input. Since our project focused on computer-generated text, we were only able to extract a few helpful details from their project, parts mentioned in the previous section\\
+Group 5 of Spring 2003 used methods similar to those of Group 3 of Fall 2007; they have some notes on character segmentation that we looked at in order to be prepared for correctly segmenting the characters 'i' and 'j' as one each, rather than two due to the dots.\\
+Group 8 of Spring 2002 also worked on converting handwriting to ASCII text; their project was very similar to that of Group 5 in Spring 2003.\\
+
+\subsubsection{License Plate Recognition Projects}
+Group 8 in Spring 2003 worked on reading and recognizing license plates. While this was clearly different from our project, their character recognition system implemented a technique called Adaptive Binarization to enhance text and background contrast. They also seemed to use a different character segmentation method than the handwriting groups, one that partially influenced some of the decisions that went into finalizing our own segmentation process.\\
+Group 18 in Spring 2000 also worked on license plate recognition; their methods were very similar to those of Group 8 in Spring 2003, but they implemented a Histogram Equalization that may prove convenient for future work on our project.\\

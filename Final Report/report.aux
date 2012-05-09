@@ -1,0 +1,183 @@
+\relax 
+\citation{jeffBier}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{4}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.1}Abstract}{4}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.2}Problem}{4}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.2.1}Background}{4}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.2.2}Specifics}{5}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.3}Proposed Solution}{5}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.3.1}Background}{5}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.3.2}Novelty}{5}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.4}Previous 18-551 Work}{5}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.4.1}Spring 2011 Group 6}{5}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.4.2}Fall 2007 Group 3}{6}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.4.3}Other Handwriting Projects}{6}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {1.4.4}License Plate Recognition Projects}{6}}
+\citation{tai}
+\citation{zhidong}
+\citation{sonia}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Algorithm Design}{7}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Overview}{7}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Information flow through Core Algorithm\relax }}{7}}
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{fig:algoOverview}{{1}{7}}
+\citation{textDetectionSurvey}
+\citation{ohya}
+\citation{hassan}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Principal Considerations}{8}}
+\@writefile{toc}{\contentsline {paragraph}{\textit  {Simple to implement}}{8}}
+\@writefile{toc}{\contentsline {paragraph}{\textit  {Modular}}{8}}
+\@writefile{toc}{\contentsline {paragraph}{\textit  {Memory Efficient}}{8}}
+\@writefile{toc}{\contentsline {paragraph}{\textit  {Fast, Minimum Computation}}{8}}
+\@writefile{toc}{\contentsline {paragraph}{\textit  {Robustness}}{8}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Pre-Processing / Segmentation}{8}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Sample of Training Dataset used. Binary images of varying font, and rotation.\relax }}{9}}
+\newlabel{fig:sampleData}{{2}{9}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Morpohlogical Image Segmentation with Strong illumination from left, Above: Image, Below: Detected text\relax }}{9}}
+\newlabel{fig:seg}{{3}{9}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Dimension Reduction}{10}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.4.1}Linear Discriminant Analysis}{10}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.4.2}Autoencoder}{10}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Structure of an autoencoder. Implements Nonlinear PCA by attempting to learn the function $h_{W,b}(x) \approx x$\relax }}{10}}
+\newlabel{fig:autoencoder}{{4}{10}}
+\citation{line}
+\citation{jain}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.4.3}Principal Component Analysis}{11}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.5}Feature Selection / Extraction}{11}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.5.1}Vertical \& Horizontal Projections}{11}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Diagram showing Vertical and Horizontal Projections\relax }}{12}}
+\newlabel{fig:proj}{{5}{12}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Diagram showing Zoning of Characters: a) Bitmap of Character b) Feature Vector formed\relax }}{12}}
+\newlabel{fig:zone}{{6}{12}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.5.2}Zoning}{12}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.5.3}Elliptical Fourier Descriptors}{13}}
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Diagram showing Zoning of Characters\relax }}{13}}
+\newlabel{fig:elliptical1}{{7}{13}}
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Character '4' reconstructed by elliptic Fourier descriptors of orders up to 1, 2, ... 10; 15, 20, 30, 40, 50, and 100 respectively\relax }}{14}}
+\newlabel{fig:elliptical}{{8}{14}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.5.4}Filter (Gabor, Laplacian)}{14}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.5.5}Correlation Filters}{14}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.6}Classification}{15}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.6.1}Linear Discriminant Analysis}{15}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.6.2}Nearest Neighbor}{15}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.6.3}Naive Bayes}{15}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.6.4}Support Vector Machine}{15}}
+\citation{frey}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.6.5}Correlation Filters}{16}}
+\@writefile{toc}{\contentsline {section}{\numberline {3}Results}{16}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Data}{16}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}SVM}{16}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.2.1}Training}{16}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.2.2}Results}{18}}
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Figure showing the accuracy using different features for our SVM\relax }}{18}}
+\newlabel{fig:svmresults}{{9}{18}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Correlation Filters}{19}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.3.1}Simple Correlation}{19}}
+\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces Simple Correlation Energy Plane between input 'A' and 'A' filter.\relax }}{19}}
+\newlabel{fig:corr}{{10}{19}}
+\newlabel{eqn332}{{1}{19}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.3.2}Equal Correlation Peak - Synthetic Discriminant Function}{20}}
+\newlabel{eqn333}{{2}{20}}
+\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces  ECP-SDF Correlation Energy Plane between input \IeC {\textquoteleft }A\IeC {\textquoteright } and \IeC {\textquoteleft }A\IeC {\textquoteright } filter\relax }}{21}}
+\newlabel{fig:corr1}{{11}{21}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.3.3}Minimum Average Correlation Energy Filter}{21}}
+\newlabel{eqn3341}{{3}{21}}
+\newlabel{eqn3342}{{4}{21}}
+\@writefile{lof}{\contentsline {figure}{\numberline {12}{\ignorespaces MACE Filter Correlation Energy Plane between input \IeC {\textquoteleft }B\IeC {\textquoteright } and \IeC {\textquoteleft }B\IeC {\textquoteright } filter.\relax }}{22}}
+\newlabel{fig:corr2}{{12}{22}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.3.4}Optimal Trade-Off Synthetic Discriminant Function}{22}}
+\newlabel{eqn3351}{{5}{22}}
+\newlabel{eqn3352}{{6}{22}}
+\@writefile{lof}{\contentsline {figure}{\numberline {13}{\ignorespaces OTSDF Correlation Energy Plan between input \IeC {\textquoteleft }B\IeC {\textquoteright } and \IeC {\textquoteleft }B\IeC {\textquoteright } filter.\relax }}{23}}
+\newlabel{fig:corr3}{{13}{23}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {3.3.5}Peak-Sidelobe Ratio}{23}}
+\newlabel{eqn336}{{7}{23}}
+\@writefile{lof}{\contentsline {figure}{\numberline {14}{\ignorespaces Simplified and masked PSR data for each correlation filter across serif and sans-serif testing sets.\relax }}{24}}
+\newlabel{fig:alexTable}{{14}{24}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Implementation}{25}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.0.6}Native Android App - OpenCV}{25}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.0.7}Android App - JavaCV}{25}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.0.8}Android Client Server Model}{25}}
+\@writefile{lof}{\contentsline {figure}{\numberline {15}{\ignorespaces Framework for Android JavaCV App\relax }}{26}}
+\newlabel{fig:androidFramework}{{15}{26}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {4.0.9}Translation}{26}}
+\@writefile{lof}{\contentsline {figure}{\numberline {16}{\ignorespaces Framework for Android Client Server Model\relax }}{27}}
+\newlabel{fig:androidCSFramework}{{16}{27}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Optimization}{27}}
+\@writefile{toc}{\contentsline {paragraph}{Memory}{27}}
+\@writefile{toc}{\contentsline {paragraph}{Multi-Threaded}{27}}
+\@writefile{toc}{\contentsline {paragraph}{Bitmap formatting}{27}}
+\@writefile{toc}{\contentsline {paragraph}{Downsampling}{28}}
+\@writefile{toc}{\contentsline {paragraph}{Faster Search}{28}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Final Product Demo}{28}}
+\@writefile{lof}{\contentsline {figure}{\numberline {17}{\ignorespaces Final Output of Android JavaCV App\relax }}{28}}
+\newlabel{fig:demo}{{17}{28}}
+\@writefile{toc}{\contentsline {paragraph}{JavaCV version}{28}}
+\@writefile{toc}{\contentsline {paragraph}{Android Client Server}{29}}
+\citation{yannle}
+\citation{yannle2}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Conclusion}{30}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.0.1}Future Work}{30}}
+\@writefile{toc}{\contentsline {paragraph}{Neural Networks}{30}}
+\@writefile{toc}{\contentsline {paragraph}{Character Location}{30}}
+\@writefile{toc}{\contentsline {paragraph}{Correlation Filter Optimizations}{30}}
+\@writefile{toc}{\contentsline {paragraph}{Translation}{30}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {6.0.2}Semester Schedule \& Work Distribution}{30}}
+\@writefile{lof}{\contentsline {figure}{\numberline {18}{\ignorespaces Schedule of work done over semester\relax }}{31}}
+\newlabel{fig:sch}{{18}{31}}
+\@writefile{lof}{\contentsline {figure}{\numberline {19}{\ignorespaces Final Distribution of Work and Responsibilities\relax }}{32}}
+\newlabel{fig:work}{{19}{32}}
+\@writefile{toc}{\contentsline {section}{\numberline {7}Credits}{33}}
+\@writefile{toc}{\contentsline {paragraph}{Professor Tom Sullivan}{33}}
+\@writefile{toc}{\contentsline {paragraph}{Professor Marios Savvides}{33}}
+\@writefile{toc}{\contentsline {paragraph}{Point TA Yogesh}{33}}
+\@writefile{toc}{\contentsline {paragraph}{Lab TAs}{33}}
+\@writefile{toc}{\contentsline {paragraph}{Everyone in CIC 1308}{33}}
+\@writefile{toc}{\contentsline {paragraph}{Classmates}{33}}
+\bibcite{class}{1}
+\bibcite{jeffBier}{2}
+\bibcite{satadal}{3}
+\bibcite{xiaoqing}{4}
+\bibcite{basil}{5}
+\bibcite{tai}{6}
+\bibcite{zhidong}{7}
+\bibcite{sadhya}{8}
+\bibcite{tess}{9}
+\bibcite{vnman}{10}
+\bibcite{abidi}{11}
+\bibcite{sonia}{12}
+\bibcite{luis}{13}
+\bibcite{chee}{14}
+\bibcite{kumar}{15}
+\bibcite{yijuan}{16}
+\bibcite{bradley}{17}
+\bibcite{tzu}{18}
+\bibcite{ronny}{19}
+\@writefile{toc}{\contentsline {section}{References}{34}}
+\bibcite{nilan}{20}
+\bibcite{alex}{21}
+\bibcite{featureSurvey}{22}
+\bibcite{igor}{23}
+\bibcite{cordella}{24}
+\bibcite{trev}{25}
+\bibcite{kath}{26}
+\bibcite{dzmou}{27}
+\bibcite{yannle}{28}
+\bibcite{yannle2}{29}
+\bibcite{derek}{30}
+\bibcite{libSVMGuide}{31}
+\bibcite{javad}{32}
+\bibcite{line}{33}
+\bibcite{marios}{34}
+\bibcite{jaehw}{35}
+\bibcite{sush}{36}
+\bibcite{textDetectionSurvey}{37}
+\bibcite{sharma}{38}
+\bibcite{lehal}{39}
+\bibcite{vedal}{40}
+\bibcite{ohya}{41}
+\bibcite{hassan}{42}
+\bibcite{libSVM}{43}
+\bibcite{OpenCV}{44}
+\bibcite{mahal}{45}
+\bibcite{frey}{46}
