@@ -1,4 +1,5 @@
 Spring 2012, 18-551 Project, Group 1 Readme.
+Built over 6 weeks.
 
 Our code is organized as such:
 
@@ -17,5 +18,5 @@ server				contains the matlab server used for the Android Server Client Model
 
 
 
-Our project dealt with implementing an OCR system on the Android Platform. A full description of our project
-is available in Final Report.
+Our project dealt with implementing an OCR system on the Android Platform. 
+A full description of our project is available in Final Report.
